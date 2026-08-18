@@ -32,14 +32,50 @@
 
     - It is a small partition (typically 100MB–512MB) formatted as `FAT32` so the motherboard's `UEFI firmware` can read it natively
 
+    - UEFI has a built-in FAT32 filesystem driver => it can read the `FAT32` filesystems directly for the `.efi` file
+
 
 # Bootloader
 
 ## What it is
 
-- A bootloader is a small program that loads the Linux kernel into memory and then executes it
+- A bootloader (GRUB is the most popular) is a small program that loads the Linux kernel into memory and then executes it
 
-- The most common Linux bootloader is `GRUB`
+- The **bootloader components** are split across two locations on the storage drive
+
+    - The EFI System Partition (`/boot/efi/`) - stored on a small `FAT32` partition
+
+        ```
+        /boot/efi/ (ESP Partition)
+        └── EFI/
+            ├── BOOT/
+            │   └── BOOTX64.EFI        <-- Fallback default UEFI binary
+            └── ubuntu/ (or debian, fedora, arch)
+                ├── grubx64.efi        <-- Main GRUB executable binary
+                ├── shimx64.efi        <-- First-stage loader for Secure Boot
+                └── mmx64.efi          <-- MokManager (for key enrollment)
+        ```
+
+    - Once UEFI locates `grubx64.efi` (UEFI has a built-in `FAT32` filesystem driver), it reads the file from the `FAT32` partition (`grub.cfg`) into RAM and executes it
+
+    - Inside `grubx64.efi`, two vital pieces of information are embedded:
+
+        - Built-in Drivers: lightweight filesystem modules (e.g., ext2/4, xfs, btrfs, lvm, luks) so GRUB can read Linux partitions that UEFI itself cannot understand
+
+    - The Main Linux Filesystem (`/boot/grub/`) - stored on an `ext4`, `btrfs`, or `XFS` partition
+
+        ```
+        /boot/grub/
+        ├── grub.cfg                   <-- Main configuration & boot menu entries
+        ├── grubenv                    <-- Dynamic environment variables (e.g., saved boot entry)
+        ├── fonts/                     <-- Graphical menu fonts (.pf2)
+        ├── themes/                    <-- Menu background images and styles
+        └── x86_64-efi/                <-- Dynamic driver modules (.mod files)
+            ├── ext2.mod
+            ├── lvm.mod
+            ├── normal.mod
+            └── ... (hundreds of modular filesystem/hardware drivers)
+        ```
 
 ## What it does
 
