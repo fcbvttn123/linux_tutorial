@@ -290,3 +290,122 @@ fg %1
 # terminating Background Jobs
 kill %1
 ```
+
+
+# Tracking Process: `top`
+
+```bash
+top - 18:06:26 up 6 days,  4:07,  2 users,  load average: 0.92, 0.62, 0.59
+Tasks: 389 total,   1 running, 387 sleeping,   0 stopped,   1 zombie
+%Cpu(s):  1.8 us,  0.4 sy,  0.0 ni, 97.6 id,  0.1 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem:  32870888 total, 27467976 used,  5402912 free,   518808 buffers
+KiB Swap: 33480700 total,    39892 used, 33440808 free. 19454152 cached Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+ 6675 patty    20   0 1731472 520960  30876 S   8.3  1.6 160:24.79 chrome
+ 6926 patty    20   0  935888 163456  25576 S   4.3  0.5   5:28.13 chrome
+```
+
+- CPU Usage Breakdown
+
+    - `us`: Percentage of CPU time spent running user processes that are not niced
+
+    - `sy`: Percentage of CPU time spent running the kernel and its processes
+
+    - `ni`: Percentage of CPU time spent running niced (low priority) user processes
+
+    - `id`: Percentage of CPU time that is idle
+
+    - `wa`: Percentage of CPU time spent waiting for I/O operations to complete. A high value might indicate a disk or network bottleneck
+
+    - `hi`: Percentage of CPU time spent servicing hardware interrupts
+
+    - `si`: Percentage of CPU time spent servicing software interrupts
+
+    - `st`: Steal time. In virtualized environments, this is the percentage of CPU time a virtual CPU waits for a real CPU, while the hypervisor is servicing another virtual processor
+
+- The Process List
+
+    - `PID`: The unique Process ID
+
+    - `USER`: The user who owns the process
+
+    - `PR`: The scheduling priority of the process
+
+    - `NI`: The "nice" value, which affects its priority
+
+    - `VIRT`: Virtual Memory used by the process. This is the total amount of memory the process can access
+
+    - `RES`: Resident Memory used by the process. This is the non-swapped physical memory a task is using. Understanding the difference between linux top virt res is key for memory analysis
+
+    - `SHR`: Shared Memory used by the process
+
+    - `S`:The status of the process: S=sleep, R=running, Z=zombie, D=uninterruptible sleep, T=stopped
+
+    - `%CPU`: The percentage of CPU time used by this process since the last update
+
+    - `%MEM`: The percentage of physical RAM used by this process
+
+    - `TIME+`: The total CPU time the process has used since it started
+
+    - `COMMAND`: The command name or command line that started the process
+
+
+# CPU Monitoring with `uptime` (the `load average` field)
+
+```bash
+pete@icebox:~$ uptime
+ 17:23:35 up 1 day,  5:59,  2 users,  load average: 0.00, 0.02, 0.05
+```
+
+- The three numbers represent the average CPU load over the last 1, 5, and 15-minute intervals
+
+- The CPU load is the average number of processes in the run-queue - meaning they are either actively being executed by the CPU or are waiting for their turn
+
+- A load average of 1.0 doesn't necessarily mean your system is struggling
+
+    - Most modern computers have multi-core processors
+
+    - If you have a quad-core (4-core) processor, a load average of 1.0 means only 25% of your total CPU capacity is being used
+
+- You can view the number of cores on your system with the command `cat /proc/cpuinfo`
+
+
+# I/O Monitoring with `iostat`
+
+```bash
+pete@icebox:~$ iostat
+Linux 3.13.0-39-lowlatency (icebox)     01/28/2016      _i686_  (1 CPU)
+
+avg-cpu:  %user   %nice %system %iowait  %steal   %idle
+           0.13    0.03    0.50    0.01    0.00   99.33
+
+Device:            tps    kB_read/s    kB_wrtn/s    kB_read    kB_wrtn
+sda               0.17         3.49         1.92     385106     212417
+```
+
+- CPU Metrics
+
+    - `%user`: Percentage of CPU time spent executing user-level (application) processes
+
+    - `%nice`: Percentage of CPU time spent on user-level processes with a modified (nice) priority
+
+    - `%system`: Percentage of CPU time spent executing system-level (kernel) processes
+
+    - `%iowait`: Percentage of time the CPU was idle while waiting for an outstanding disk I/O request to complete. High values here can indicate a storage bottleneck
+
+    - `%steal`: In a virtualized environment, this is the percentage of time a virtual CPU waits for a real CPU while the hypervisor is servicing another virtual processor
+
+    - `%idle`: Percentage of time the CPU was idle and not waiting for any disk I/O requests
+
+- Analyzing Disk Utilization
+
+    - `tps`: Transfers per second issued to the device. A transfer is an I/O request, and multiple logical requests can be combined into a single one
+
+    - `kB_read/s`: The amount of data read from the device, expressed in kilobytes per second
+
+    - `kB_wrtn/s`: The amount of data written to the device, expressed in kilobytes per second
+
+    - `kB_read`: The total number of kilobytes read from the device since the last reboot
+
+    - `kB_wrtn`: The total number of kilobytes written to the device since the last reboot
