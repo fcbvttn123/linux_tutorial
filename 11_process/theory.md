@@ -358,7 +358,7 @@ pete@icebox:~$ uptime
  17:23:35 up 1 day,  5:59,  2 users,  load average: 0.00, 0.02, 0.05
 ```
 
-- The three numbers represent the average CPU load over the last 1, 5, and 15-minute intervals
+- The three numbers represent the average CPU load (for all cores) over the last 1, 5, and 15-minute intervals
 
 - The CPU load is the average number of processes in the run-queue - meaning they are either actively being executed by the CPU or are waiting for their turn
 
@@ -367,6 +367,14 @@ pete@icebox:~$ uptime
     - Most modern computers have multi-core processors
 
     - If you have a quad-core (4-core) processor, a load average of 1.0 means only 25% of your total CPU capacity is being used
+
+- Rule of thumb
+
+    - **Below 0.70 per core**: Ideal operating range. The system handles traffic smoothly with plenty of headroom
+
+    - **1.00 per core**: Fully saturated. Every core is busy, but no jobs are sitting idle waiting in line
+
+    - **Above 1.00 per core**: Over-subscribed. Processes are actively queueing up and waiting for CPU or disk time, causing latency
 
 - You can view the number of cores on your system with the command `cat /proc/cpuinfo`
 
