@@ -77,3 +77,51 @@ sudo smbpasswd -a [username]
 # Mount a Samba Share
 sudo mount -t cifs //SERVER/sharename /mnt/mountpoint -o user=username,pass=password
 ```
+
+
+# Network Config
+
+## Network Interfaces
+
+Temporary Config
+
+```bash
+# show infomation for all interfaces
+ip link show
+
+# show detailed statistics for a specific interface
+ip -s link show eth0
+
+# show IP addresses assigned to interfaces
+ip address show
+
+# bring an interface up or down
+ip link set eth0 up
+ip link set eth0 down
+
+# add an IP address to an interface
+ip address add 192.168.1.1/24 dev eth0
+```
+
+Permanent Config
+
+`/etc/network/interfaces`
+
+## Route
+
+```bash
+# add a route
+ip route add 192.168.2.1/23 via 10.11.12.3
+
+# delete a route
+ip route delete 192.168.2.1/23 via 10.11.12.3
+```
+
+## Arp
+
+```bash
+pete@icebox:~$ arp
+Address                  HWtype  HWaddress           Flags Mask            Iface
+192.168.22.1            ether   00:12:24:fc:12:cc   C                     eth0
+192.168.22.254          ether   00:12:45:f2:84:64   C                     eth0
+```
