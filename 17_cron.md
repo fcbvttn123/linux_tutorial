@@ -6,6 +6,7 @@
 - [Syntax](#syntax)
 - [Where to define `cron jobs`](#where-to-define-cron-jobs)
 - [`/etc/crontab` vs `/etc/cron.d/`](#etccrontab-vs-etccrond)
+- [Shortcuts: replace 5 time fields](#shortcuts-replace-5-time-fields)
 
 # What is `cron`
 
@@ -69,3 +70,17 @@
 - `/etc/cron.d/` files include a username: `0 2 * * * /home/alice/backup.sh`
 
 - `/etc/cron.d/backup`: `0 2 * * * alice /home/alice/backup.sh`
+
+# Shortcuts: replace 5 time fields
+
+- `@reboot`: Runs once at system startup
+
+- `@yearly` or `@annually`: Runs once a year (0 0 1 1 *)
+
+- `@monthly`: Runs once a month (0 0 1 * *)
+
+- `@weekly`: Runs once a week (0 0 * * 0)
+
+- `@daily` or `@midnight`: Runs once a day (0 0 * * *)
+
+- `@hourly`: Runs once an hour (0 * * * *)
