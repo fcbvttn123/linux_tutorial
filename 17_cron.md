@@ -67,9 +67,9 @@
 
 # `/etc/crontab` vs `/etc/cron.d/`
 
-- `/etc/cron.d/` files include a username: `0 2 * * * /home/alice/backup.sh`
+- `/var/spool/cron/crontabs/<username>` files include a username: `0 2 * * * /home/alice/backup.sh`
 
-- `/etc/cron.d/backup`: `0 2 * * * alice /home/alice/backup.sh`
+- `/etc/cron.d/<filename>`: `0 2 * * * alice /home/alice/backup.sh`
 
 # Shortcuts: replace 5 time fields
 

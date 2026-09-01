@@ -38,3 +38,6 @@ openssl s_client -connect localhost:30001
 
 # port scanning
 nmap -sV -p 31000-32000 localhost
+
+# execute the binary directly
+./binary-file
