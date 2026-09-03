@@ -69,3 +69,74 @@
     - `$owner_backup`
 
     - `${owner}_backup`
+
+- For Loop Syntax
+
+    - `for i in {0000..9999}; do`
+
+    - `for file in *.txt; do`
+
+- `/etc/passwd`
+
+    - Despite the file name, it doesn't contain user actual password. Password hashes are usually stored in `/etc/shadow`
+
+    - Line: `username:password:UID:GID:comment:home:shell`
+    
+    - Example: `alice:x:1000:1000:Alice:/home/alice:/bin/bash`
+
+        - `x` -> password information is stored elsewhere, typically `/etc/shadow`
+
+- `/bin/bash`
+
+    - `bash` is a file without any extension, it reads commands and interpret them (command interpreter)
+
+    - Bash Builtin Commands (e.g, `echo`)
+
+        - When you type `echo`, Bash doesn't find and launch a separate `/bin/echo` program
+
+        - Bash can execute its built-in `echo` directly
+
+    - External Executable Program (e.g, `ls`)
+
+        - Bash typically searches directories listed in the `$PATH` to find the executable, such as `/bin/ls` or `/usr/bin/ls`
+
+        - Bash finds `/bin/ls` and starts the `ls` program
+
+    - After you SSH into the server, it starts whatever login shell is configured for your account
+
+- Script
+
+    ```bash
+    #!/bin/sh
+    export TERM=linux
+    exec more ~/text.txt
+    exit 0
+    ```
+
+    - `#!/bin/sh` (shebang)
+
+        - It tells Linux use `/bin/sh` to interpret this file
+
+        - When you execute the file `./myscript`, Linux sees the `#!` and effectively starts `/bin/sh ./myscript` -> `/bin/sh` is the interpreter for this script
+
+        - Why not `#!/bin/bash`?
+
+            - `#!/bin/sh` requests the system's `sh` shell
+
+            - Historically, Unix had a shell called the Bourne shell, commonly invoked as `sh`
+
+            - The author wants the script to be portable
+
+    - `exec`
+
+        - Normally, if a shell runs `more ~/text.txt`, the process relationship looks roughly like `shell -> more`
+
+        - The shell starts `more` as another process
+
+        - But `exec more ~/text.txt` means replace the current `shell` process with the `more` program
+
+    - The `exit 0` is effectively unreachable
+
+        - Because `exec more ~/text.txt` replaced the shell with `more`
+
+        - The original shell doesn't continue executing afterward -> the SSH session is closed
