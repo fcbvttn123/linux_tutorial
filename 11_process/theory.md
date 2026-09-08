@@ -1,3 +1,45 @@
+# Contents
+
+- [Contents](#contents)
+- [`ps` (Processes)](#ps-processes)
+  - [What is a Linux Process](#what-is-a-linux-process)
+  - [Popular `ps` commands](#popular-ps-commands)
+  - [Real-Time Monitoring with `top`](#real-time-monitoring-with-top)
+- [Controlling Terminal](#controlling-terminal)
+  - [What is a TTY](#what-is-a-tty)
+  - [Terminal Devices vs Pseudo-Terminals](#terminal-devices-vs-pseudo-terminals)
+  - [The Role of the Controlling Terminal](#the-role-of-the-controlling-terminal)
+  - [Processes Without a Controlling Terminal](#processes-without-a-controlling-terminal)
+- [Process Creation](#process-creation)
+  - [The `fork` and `exec` Model](#the-fork-and-exec-model)
+  - [The `init` process](#the-init-process)
+- [Process Termination](#process-termination)
+  - [Termination Steps](#termination-steps)
+  - [Zombie vs Orphan Process](#zombie-vs-orphan-process)
+- [Signals](#signals)
+  - [The Purpose of Signals](#the-purpose-of-signals)
+  - [The Signal Lifecycle](#the-signal-lifecycle)
+  - [Common Linux Process Signals](#common-linux-process-signals)
+- [Kill (Terminate)](#kill-terminate)
+  - [Default Termination with `kill sigterm`](#default-termination-with-kill-sigterm)
+  - [Forcing Termination with SIGKILL](#forcing-termination-with-sigkill)
+  - [Checking Process Existence with `kill -0`](#checking-process-existence-with-kill--0)
+- [Niceness](#niceness)
+  - [How the CPU Manages Processes](#how-the-cpu-manages-processes)
+  - [What is Niceness in Linux](#what-is-niceness-in-linux)
+  - [Adjusting Process Priority](#adjusting-process-priority)
+- [Job Control](#job-control)
+  - [What it is](#what-it-is)
+  - [Commands](#commands)
+- [Tracking Process: `top`](#tracking-process-top)
+- [CPU Monitoring with `uptime` (the `load average` field)](#cpu-monitoring-with-uptime-the-load-average-field)
+- [I/O Monitoring with `iostat`](#io-monitoring-with-iostat)
+- [Memory Monitoring with `vmstat`](#memory-monitoring-with-vmstat)
+- [Historical Analysis (`sar`)](#historical-analysis-sar)
+
+
+
+
 # `ps` (Processes)
 
 ## What is a Linux Process
@@ -161,11 +203,28 @@
     
     - It is adopted by `init` and continues to execute until it finishes
 
-- `zombie process`
+- `zombie process` (Z state)
 
-    - A dead process that has completed its execution but still has an entry in the process table (the parent has not yet called `wait`)
+    - They are dead processes whose parent hasn't read their **exit status** via `wait()`
     
-    - It is waiting for its parent process to read its `exit` status
+    - Zombies consume no CPU and no RAM, the only resource a zombie consumes is a PID entry in the OS process table
+
+    - Find the parent process ID (PPID) using `ps -eo pid,ppid,stat,cmd | grep "Z"`
+
+        ```bash
+          PID   PPID S CMD
+        12345   6789 Z [myprogram] <defunct>
+        12456   6789 Z [worker] <defunct>
+        ```
+
+    - Find the parent process using `ps -p 6789 -o pid,ppid,state,cmd`
+
+        ```bash
+         PID    PPID S CMD
+        6789    1200 S ./my-parent-program
+        ```
+
+    - You generally **cannot kill a zombie itself — it's already dead**. The parent needs to call `wait()` to collect the child's exit status
 
 
 # Signals
