@@ -20,7 +20,7 @@
   - [The Purpose of Signals](#the-purpose-of-signals)
   - [The Signal Lifecycle](#the-signal-lifecycle)
   - [Common Linux Process Signals](#common-linux-process-signals)
-- [Kill (Terminate)](#kill-terminate)
+- [Kill](#kill)
   - [Default Termination with `kill sigterm`](#default-termination-with-kill-sigterm)
   - [Forcing Termination with SIGKILL](#forcing-termination-with-sigkill)
   - [Checking Process Existence with `kill -0`](#checking-process-existence-with-kill--0)
@@ -235,6 +235,8 @@
 
 - Each signal is defined by an integer, but they are almost always referred to by their symbolic names, which start with `SIG`
 
+- You can send signals to processes using utilities like `kill`
+
 ## The Signal Lifecycle
 
 - When an event generates a `signal`, it is first delivered to a target process
@@ -260,7 +262,7 @@
 - `SIGSTOP`: Stop. Pauses the process. Like SIGKILL, it cannot be caught or ignored
 
 
-# Kill (Terminate)
+# Kill
 
 ## Default Termination with `kill sigterm`
 
