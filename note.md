@@ -140,3 +140,37 @@
         - Because `exec more ~/text.txt` replaced the shell with `more`
 
         - The original shell doesn't continue executing afterward -> the SSH session is closed
+
+- `echo $PATH`
+
+    - Example Output: `/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games`
+
+    - Every entry in the output is an absolute path to a specific folder, separated by the `:`
+
+    - The shell reads the list strictly from left to right
+
+    - If you type a command like `ls`, the shell first checks `/usr/local/sbin`. If it doesn't find it, it moves to `/usr/local/bin`, and so on
+
+    - If it scans the entire list and finds nothing, it returns a `command not found` error
+
+- `/usr/bin`
+
+    - It contains executable programs (commands) that are available to normal users
+
+        ```bash
+        /usr/bin/
+            ├── ls
+            ├── cp
+            ├── mv
+            ├── grep
+            ├── find
+            ├── python3
+            ├── git
+            ├── ssh
+            ├── vim
+            └── ...
+        ```
+
+    - You DO NOT manually put files here, `/usr/bin` is normally managed by the Linux distribution's package manager
+
+    - `sudo apt install git` may install `git` executable into `/usr/bin`
