@@ -1,3 +1,32 @@
+# Contents
+
+- [Contents](#contents)
+- [Overview](#overview)
+  - [File System vs Partition](#file-system-vs-partition)
+  - [Check FS on the system (`df`)](#check-fs-on-the-system-df)
+- [Some Important Folders](#some-important-folders)
+  - [Essential System Directories](#essential-system-directories)
+  - [User and Application Data](#user-and-application-data)
+  - [Device and Mount Points](#device-and-mount-points)
+- [VFS and Journal](#vfs-and-journal)
+  - [The Role of the Virtual File System](#the-role-of-the-virtual-file-system)
+  - [Journaling for Data Integrity](#journaling-for-data-integrity)
+- [Anatomy of a disk](#anatomy-of-a-disk)
+  - [The Partition Table](#the-partition-table)
+  - [MBR Partitions (traditional)](#mbr-partitions-traditional)
+  - [GPT Partitions (modern)](#gpt-partitions-modern)
+- [Filesystem Structure](#filesystem-structure)
+  - [Boot block](#boot-block)
+  - [Superblock](#superblock)
+  - [Inode Table](#inode-table)
+  - [Data blocks](#data-blocks)
+- [`/etc/fstab`](#etcfstab)
+  - [What is it](#what-is-it)
+  - [The fstab File Structure](#the-fstab-file-structure)
+
+
+
+
 # Overview
 
 ## File System vs Partition

@@ -224,3 +224,77 @@ apt list --installed
 sudo apt install <package>
 sudo apt remove <package>
 ```
+
+
+
+
+# Disks, Filesystems, and Storage
+
+```bash
+# check file system
+$ df -T
+Filesystem     Type     1K-blocks    Used Available Use% Mounted on
+/dev/sda1      ext4       6461592 2402708   3707604  40% /
+udev           devtmpfs    501356       4    501352   1% /dev
+tmpfs          tmpfs       102544    1068    101476   2% /run
+/dev/sda6      xfs       13752320  460112  13292208   4% /home
+
+# disk space: how much space is available on the filesystem?
+$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  100G   72G   23G  76% /
+/dev/nvme0n1p1  512M  120M  392M  24% /boot
+tmpfs            16G  2.1M   16G   1% /run
+# disk space: which files/directories are using that space?
+$ du -sh /*
+2.4G    /bin
+8.7G    /home
+1.2G    /opt
+65G     /var
+4.1G    /usr
+20M     /tmp
+
+# list block devices
+$ lsblk
+NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
+sda           8:0    0 223.6G  0 disk 
+├─sda1        8:1    0   512M  0 part /boot/efi
+├─sda2        8:2    0  1.5G   0 part /boot
+└─sda3        8:3    0 221.6G  0 part 
+  ├─vg-root 253:0    0    40G  0 lvm  /
+  ├─vg-swap 253:1    0     4G  0 lvm  [SWAP]
+  └─vg-home 253:2    0 177.6G  0 lvm  /home
+sr0          11:0    1  1024M  0 rom
+
+# find the exact UUID of a partition to configure persistent automounting in /etc/fstab
+$ sudo blkid
+/dev/sda1: UUID="A1B2-C3D4" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="000a1234-01"
+/dev/sda2: UUID="5f3e9c12-38fa-4bfa-91b4-b2586e1141bc" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="000a1234-02"
+/dev/sdb1: LABEL="DataDisk" UUID="7fa9c421-0054-4555-b0ca-b470a97a3d84" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="111b5678-01"
+/dev/sdc1: UUID="2026-03-02-12-00-00-00" LABEL="Ubuntu-Server" TYPE="iso9660" PTUUID="4af3c21b" PTTYPE="dos"
+/dev/nvme0n1p1: UUID="E4F2-89AC" BLOCK_SIZE="512" TYPE="vfat" PARTLABEL="EFI System Partition" PARTUUID="d123e456-bcde-4789-ba12-3456789abcdef"
+
+# display detailed low-level partition table information for all connected disks
+$ sudo fdisk -l
+
+Disk /dev/sda: 500 GiB, 536870912000 bytes, 1048576000 sectors
+Disk model: Samsung SSD 870
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+Device       Start        End   Sectors   Size Type
+/dev/sda1     2048     1050623   1048576   512M EFI System
+/dev/sda2  1050624    84903935  83853312    40G Linux filesystem
+/dev/sda3 84903936 1048575966 959071031 457.5G Linux filesystem
+
+
+Disk /dev/sdb: 1 TiB, 1099511627776 bytes, 2147483648 sectors
+Disk model: WD Blue
+Units: sectors of 1 * 512 = 512 bytes
+Sector size (logical/physical): 512 bytes / 512 bytes
+I/O size (minimum/optimal): 512 bytes / 512 bytes
+
+Device       Start        End     Sectors  Size Type
+/dev/sdb1     2048 2147483647 2147481600    1T Linux filesystem
+```
