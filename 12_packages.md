@@ -1,3 +1,28 @@
+# Contents
+
+- [Contents](#contents)
+- [Software Distribution](#software-distribution)
+  - [What are Linux packages](#what-are-linux-packages)
+  - [The Software Supply Chain](#the-software-supply-chain)
+  - [Common Package Formats](#common-package-formats)
+- [Package Repo](#package-repo)
+  - [What is a package repo](#what-is-a-package-repo)
+  - [Central Repositories vs Third-Party Repositories](#central-repositories-vs-third-party-repositories)
+- [`tar` and `gzip`](#tar-and-gzip)
+  - [Archiving vs. Compression](#archiving-vs-compression)
+  - [Compressing/Decompressing Single Files with `gzip`](#compressingdecompressing-single-files-with-gzip)
+  - [Creating Archives with `tar`](#creating-archives-with-tar)
+  - [`tar` and `gzip` combined](#tar-and-gzip-combined)
+- [`rpm` and `dpkg`](#rpm-and-dpkg)
+  - [What they are](#what-they-are)
+  - [Package Management](#package-management)
+- [`yum` and `apt`](#yum-and-apt)
+  - [Differences from `rpm` and `dpkg`](#differences-from-rpm-and-dpkg)
+  - [Package Management](#package-management-1)
+
+
+
+
 # Software Distribution
 
 ## What are Linux packages
@@ -154,13 +179,38 @@ rpm -qa
 sudo apt update
 sudo apt upgrade
 sudo apt full-upgrade
-
 # finding & inspecting packages
 apt search <package>
 apt show <package>
 apt list --installed
-
 # installing & removing packages
 sudo apt install <package>
 sudo apt remove <package>
+
+# example: check whether Nginx is already installed
+$ apt list --installed 2> /dev/null | grep nginx
+# example: if nothing comes back, check the package repository
+$ apt policy nginx
+nginx:
+  Installed: (none)
+  Candidate: 1.24.0-2ubuntu7
+  Version table:
+     1.24.0-2ubuntu7 500
+        500 http://archive.ubuntu.com/ubuntu noble/main amd64 Packages
+# example: update the package index: get the latest catalog from the repositories, it doesn't upgrade your installed packages
+$ sudo apt update
+# example: install nginx
+$ sudo apt install nginx
+# example: find exactly what files the package installed
+$ dpkg -L nginx
+/usr/sbin/nginx
+/usr/share/doc/nginx
+/usr/share/nginx
+/usr/share/nginx/html
+...
+# example: upgrade
+$ sudo apt upgrade
+The following packages will be upgraded:
+  curl nginx openssl
+3 upgraded, 0 newly installed, 0 to remove.
 ```

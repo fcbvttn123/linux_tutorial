@@ -118,3 +118,109 @@ chmod ug+w myfile
 # changing permission with number: 4 (r), 2 (w), 1 (x)
 chmod 755 myfile
 ```
+
+
+
+
+# Processes
+```bash
+# monitor processes
+$ ps -eo pid,ppid,stat,cmd
+  PID   PPID S CMD
+12345   6789 Z [myprogram] <defunct>
+12456   6789 Z [worker] <defunct>
+
+# top
+top - 18:06:26 up 6 days,  4:07,  2 users,  load average: 0.92, 0.62, 0.59
+Tasks: 389 total,   1 running, 387 sleeping,   0 stopped,   1 zombie
+%Cpu(s):  1.8 us,  0.4 sy,  0.0 ni, 97.6 id,  0.1 wa,  0.0 hi,  0.0 si,  0.0 st
+KiB Mem:  32870888 total, 27467976 used,  5402912 free,   518808 buffers
+KiB Swap: 33480700 total,    39892 used, 33440808 free. 19454152 cached Mem
+
+  PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
+ 6675 patty    20   0 1731472 520960  30876 S   8.3  1.6 160:24.79 chrome
+ 6926 patty    20   0  935888 163456  25576 S   4.3  0.5   5:28.13 chrome
+
+# nice/renice
+nice -n 5 apt upgrade
+renice 10 -p 3245
+
+# signal: terminate gracefully (SIGTERM 15)
+kill PID
+# signal: terminate forcefully (SIFKILL 9)
+kill -KILL PID
+# signal: reload configuration for programs (SIGHUP 1)
+kill -HUP PID
+# signal: suspend process (SIGSTOP 19)
+kill -STOP PID
+
+# job control: start command in background
+$ sleep 1000 &
+[1] 4521
+# job control: show shell's job
+$ jobs
+[1]+  Running                 sleep 1000 &
+[2]-  Running                 ping google.com &
+# job control: bring job to foreground
+$ fg %1
+ping google.com
+64 bytes from 142.250.190.46: icmp_seq=5 ttl=116 time=14.2 ms
+64 bytes from 142.250.190.46: icmp_seq=6 ttl=116 time=12.1 ms
+# job control: move job to background
+$ bg %1
+[1]- sleep 500 &
+# job control: keep running after logout
+$ nohup ./backup.sh &
+nohup: ignoring input and appending output to 'nohup.out'
+[1] 5321
+
+# RAM: focus on available number, not free
+$ free -h
+               total        used        free      shared  buff/cache   available
+Mem:            15Gi        6.2Gi       1.1Gi       512Mi       7.8Gi       8.9Gi
+Swap:          2.0Gi        256Mi       1.8Gi
+
+# iostat: is my server slow because the storage/disk is slow?
+$ iostat
+Linux 6.8.0 (server01)  09/08/2026  _x86_64_
+avg-cpu:  %user   %system   %iowait  %steal   %idle
+           12.50      3.20      8.40     0.00    75.90
+Device             tps   kB_read/s   kB_wrtn/s   kB_read   kB_wrtn
+sda             45.20       850.40       320.10     1024000     384000
+nvme0n1         120.50      4500.20      2100.40     5400240    2520480
+
+# disk space: how much space is available on the filesystem?
+$ df -h
+Filesystem      Size  Used Avail Use% Mounted on
+/dev/nvme0n1p2  100G   72G   23G  76% /
+/dev/nvme0n1p1  512M  120M  392M  24% /boot
+tmpfs            16G  2.1M   16G   1% /run
+# disk space: which files/directories are using that space?
+$ du -sh /*
+2.4G    /bin
+8.7G    /home
+1.2G    /opt
+65G     /var
+4.1G    /usr
+20M     /tmp
+```
+
+
+
+
+# Package Management
+```bash
+# updating & upgrading packages
+sudo apt update
+sudo apt upgrade
+sudo apt full-upgrade
+
+# finding & inspecting packages
+apt search <package>
+apt show <package>
+apt list --installed
+
+# installing & removing packages
+sudo apt install <package>
+sudo apt remove <package>
+```
