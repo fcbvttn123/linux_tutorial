@@ -22,6 +22,7 @@
   - [Partition Table Details](#partition-table-details)
   - [Partition Management](#partition-management)
   - [Format, Mount](#format-mount)
+- [systemd](#systemd)
 
 
 
@@ -382,4 +383,37 @@ sudo umount /mnt/data
 
 # mount by UUID
 sudo blkid /dev/sdb1
+```
+
+
+
+
+# systemd
+
+```bash
+# systemctl
+systemctl status <service>
+systemctl start <service>
+systemctl stop <service>
+systemctl restart <service>
+systemctl enable <service>
+systemctl disable <service>
+systemctl enable --now <service>
+systemctl is-active <service>
+systemctl is-enabled <service>
+systemctl list-units
+systemctl list-units --type=service
+systemctl list-unit-files
+systemctl get-default
+systemctl list-dependencies <service>
+systemctl cat <service>
+systemctl show <service>
+sudo systemctl daemon-reload
+
+# logs
+journalctl
+journalctl -u <service>
+journalctl -u <service> -f
+journalctl -b
+journalctl -b -1
 ```
