@@ -1,3 +1,31 @@
+# Contents
+
+- [Contents](#contents)
+- [Bandit Game](#bandit-game)
+- [User and Group Management](#user-and-group-management)
+  - [Core Files](#core-files)
+  - [User Management](#user-management)
+  - [Group Management](#group-management)
+  - [Auditing \& Inspecting Access](#auditing--inspecting-access)
+  - [Owner / Permission](#owner--permission)
+- [Processes](#processes)
+  - [ps, top](#ps-top)
+  - [nice](#nice)
+  - [Job Control](#job-control)
+  - [RAM, Disk](#ram-disk)
+- [Package Management](#package-management)
+- [Disks, Filesystems](#disks-filesystems)
+  - [Check file system](#check-file-system)
+  - [Disk Space](#disk-space)
+  - [List Block Devices](#list-block-devices)
+  - [Get Partition UUID](#get-partition-uuid)
+  - [Partition Table Details](#partition-table-details)
+  - [Partition Management](#partition-management)
+  - [Format, Mount](#format-mount)
+
+
+
+
 # Bandit Game
 
 ```bash
@@ -123,6 +151,9 @@ chmod 755 myfile
 
 
 # Processes
+
+## ps, top
+
 ```bash
 # monitor processes
 $ ps -eo pid,ppid,stat,cmd
@@ -140,7 +171,11 @@ KiB Swap: 33480700 total,    39892 used, 33440808 free. 19454152 cached Mem
   PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND
  6675 patty    20   0 1731472 520960  30876 S   8.3  1.6 160:24.79 chrome
  6926 patty    20   0  935888 163456  25576 S   4.3  0.5   5:28.13 chrome
+```
 
+## nice
+
+```bash
 # nice/renice
 nice -n 5 apt upgrade
 renice 10 -p 3245
@@ -153,7 +188,11 @@ kill -KILL PID
 kill -HUP PID
 # signal: suspend process (SIGSTOP 19)
 kill -STOP PID
+```
 
+## Job Control
+
+```bash
 # job control: start command in background
 $ sleep 1000 &
 [1] 4521
@@ -173,7 +212,11 @@ $ bg %1
 $ nohup ./backup.sh &
 nohup: ignoring input and appending output to 'nohup.out'
 [1] 5321
+```
 
+## RAM, Disk
+
+```bash
 # RAM: focus on available number, not free
 $ free -h
                total        used        free      shared  buff/cache   available
@@ -228,8 +271,9 @@ sudo apt remove <package>
 
 
 
-# Disks, Filesystems, and Storage
+# Disks, Filesystems
 
+## Check file system
 ```bash
 # check file system
 $ df -T
@@ -238,7 +282,10 @@ Filesystem     Type     1K-blocks    Used Available Use% Mounted on
 udev           devtmpfs    501356       4    501352   1% /dev
 tmpfs          tmpfs       102544    1068    101476   2% /run
 /dev/sda6      xfs       13752320  460112  13292208   4% /home
+```
 
+## Disk Space
+```bash
 # disk space: how much space is available on the filesystem?
 $ df -h
 Filesystem      Size  Used Avail Use% Mounted on
@@ -253,7 +300,10 @@ $ du -sh /*
 65G     /var
 4.1G    /usr
 20M     /tmp
+```
 
+## List Block Devices
+```bash
 # list block devices
 $ lsblk
 NAME        MAJ:MIN RM   SIZE RO TYPE MOUNTPOINTS
@@ -265,7 +315,11 @@ sda           8:0    0 223.6G  0 disk
   ├─vg-swap 253:1    0     4G  0 lvm  [SWAP]
   └─vg-home 253:2    0 177.6G  0 lvm  /home
 sr0          11:0    1  1024M  0 rom
+```
 
+## Get Partition UUID
+
+```bash
 # find the exact UUID of a partition to configure persistent automounting in /etc/fstab
 $ sudo blkid
 /dev/sda1: UUID="A1B2-C3D4" BLOCK_SIZE="512" TYPE="vfat" PARTUUID="000a1234-01"
@@ -273,7 +327,11 @@ $ sudo blkid
 /dev/sdb1: LABEL="DataDisk" UUID="7fa9c421-0054-4555-b0ca-b470a97a3d84" BLOCK_SIZE="4096" TYPE="ext4" PARTUUID="111b5678-01"
 /dev/sdc1: UUID="2026-03-02-12-00-00-00" LABEL="Ubuntu-Server" TYPE="iso9660" PTUUID="4af3c21b" PTTYPE="dos"
 /dev/nvme0n1p1: UUID="E4F2-89AC" BLOCK_SIZE="512" TYPE="vfat" PARTLABEL="EFI System Partition" PARTUUID="d123e456-bcde-4789-ba12-3456789abcdef"
+```
 
+## Partition Table Details
+
+```bash
 # display detailed low-level partition table information for all connected disks
 $ sudo fdisk -l
 
@@ -297,4 +355,31 @@ I/O size (minimum/optimal): 512 bytes / 512 bytes
 
 Device       Start        End     Sectors  Size Type
 /dev/sdb1     2048 2147483647 2147481600    1T Linux filesystem
+```
+
+## Partition Management
+
+```bash
+# create a disk partition (MBR)
+sudo fdisk /dev/sdb
+# create a disk partition (GPT)
+sudo parted /dev/sdb print
+```
+
+## Format, Mount
+
+```bash
+# create an ext4 filesystem
+sudo mkfs.ext4 /dev/sdb1
+# create an XFS filesystem
+sudo mkfs.xfs /dev/sdb1
+
+# create a mount point and mount a partition
+sudo mkdir -p /mnt/data
+sudo mount /dev/sdb1 /mnt/data
+# unmount
+sudo umount /mnt/data
+
+# mount by UUID
+sudo blkid /dev/sdb1
 ```
