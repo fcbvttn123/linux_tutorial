@@ -1,3 +1,28 @@
+# Contents
+
+- [Contents](#contents)
+- [What is `systemd`](#what-is-systemd)
+- [`systemctl`](#systemctl)
+  - [Start, restart, and stop services](#start-restart-and-stop-services)
+  - [Enable vs start](#enable-vs-start)
+- [What is a `unit`](#what-is-a-unit)
+- [Understanding service files](#understanding-service-files)
+  - [What they are](#what-they-are)
+  - [Core Structure of a Service File](#core-structure-of-a-service-file)
+  - [Basic Management Workflow](#basic-management-workflow)
+- [Dependencies](#dependencies)
+  - [Requirement Dependencies](#requirement-dependencies)
+  - [Ordering Dependencies](#ordering-dependencies)
+  - [Special Targets \& System Triggers](#special-targets--system-triggers)
+- [`.service` units](#service-units)
+- [`.target` units](#target-units)
+- [`.timer` units](#timer-units)
+- [systemd log - `journalctl`](#systemd-log---journalctl)
+- [Commands](#commands)
+
+
+
+
 # What is `systemd`
 
 - `systemd` is the system and service manager
@@ -96,6 +121,164 @@ sudo systemctl restart nginx
 
 
 
+# Understanding service files
+
+## What they are
+
+- A `systemd` service file is a plain-text configuration file that tells Linux how, when, and under what conditions to run a background process (`daemon`)
+
+- Systemd looks for these unit files in two primary locations:
+
+    - `/lib/systemd/system/` or `/usr/lib/systemd/system/`: System-installed default services (managed by package managers)
+
+    - `/etc/systemd/system/`: Custom or user-defined services (takes precedence over defaults)
+
+## Core Structure of a Service File
+
+```bash
+[Unit]
+Description=My Custom Application Service
+After=network.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=appuser
+Group=appgroup
+WorkingDirectory=/opt/myapp
+ExecStart=/usr/bin/python3 /opt/myapp/main.py
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
+```
+
+- 3 main sections: `[Unit]`, `[Service]`, and `[Install]`
+
+- `[Unit]`
+
+    - `Description`: A human-readable name shown in log outputs (systemctl status)
+
+    - `After`: Defines execution ordering. `After=network.target` means this service starts after network services start, but it doesn't strictly depend on them
+
+    - `Requires`: Strict dependency. If the named unit fails or stops, this service stops too
+
+    - `Wants`: Soft dependency. Systemd will attempt to start the listed unit, but will continue starting your service even if that unit fails
+
+- `[Service]`
+
+    - `Type`: Tells systemd how the process behaves
+
+        - `simple` (default): Systemd assumes the service starts immediately upon launching ExecStart
+
+        - `forking`: Used when the process spawns a child process and the main process exits (typical for legacy daemons)
+
+        - `oneshot`: The process executes, finishes, and exits (useful for startup scripts)
+
+    - `ExecStart`: The full path to the executable command to run
+
+    - `ExecReload` / `ExecStop`: Commands to execute when reloading or stopping the service
+
+    - `User` / `Group`: Runs the process under a non-root service account for security
+
+    - `Restart`: Defines recovery behavior (always, on-failure, no)
+
+    - `RestartSec`: How long to wait before attempting a restart
+
+- `[Install]`
+
+    - Enablement and Target States
+
+    - `WantedBy`: Defines which target (system state) enables this service when turned on at boot
+    
+    - `multi-user.target` is standard for non-graphical multi-user boot states (similar to traditional runlevel 3)
+
+## Basic Management Workflow
+
+- Once a service file is placed in `/etc/systemd/system/my-service.service`
+
+    ```bash
+    # Tell systemd to re-scan unit files after creating or editing
+    sudo systemctl daemon-reload
+    # Start the service immediately
+    sudo systemctl start my-service
+    # Enable the service to launch at boot (creates symlinks in target directories)
+    sudo systemctl enable my-service
+    # Inspect status, logs, and process IDs
+    sudo systemctl status my-service
+    ```
+
+
+
+
+# Dependencies
+
+## Requirement Dependencies
+
+- **Requirement directives** tell `systemd` which other units must exist or be active alongside your service
+
+- `Wants`= (Soft Dependency - Recommended)
+
+    - Systemd will attempt to start the listed units when starting your service
+
+    - If the wanted unit fails to start or is missing, your service still runs anyway
+
+    - Use case: Non-critical helper services, optional logging tools
+
+- `Requires`= (Hard Dependency)
+
+    - Systemd will start the listed units when starting your service
+
+    - If any listed unit fails to start or stops later, your service will immediately fail or shut down
+
+    - Use case: A web app that physically cannot launch without an attached database local socket
+
+- `BindsTo`= (Strict Lifecycle Lock)
+
+    - Similar to Requires=, but stronger: if the linked unit is stopped, restarted, or dies unexpectedly at any point, your service dies instantly with it
+
+    - Use case: Services tied directly to specific hardware devices (like a network interface or USB device)
+
+- `Conflicts`= (Mutually Exclusive)
+
+    - If your service starts, any active unit listed in Conflicts= will be stopped immediately (and vice-versa)
+
+    - Use case: Preventing two firewall tools or network managers from running simultaneously
+
+## Ordering Dependencies
+
+- Crucial Rule: `Wants=` and `Requires=` do NOT control execution order
+
+    - They only tell `systemd` to start the services concurrently
+    
+    - If service B requires service A, `systemd` will launch both at the exact same millisecond unless ordering is specified
+
+- `After=`
+
+    - Ensures your unit starts after the listed units have finished starting
+
+    - Example: After=network-online.target guarantees network configuration is completely established before your service attempts to bind ports
+
+- `Before=`
+
+    - Ensures your unit starts and settles before the listed units begin launching
+
+## Special Targets & System Triggers
+
+- Systemd uses Targets (groupings of unit files) to coordinate broad system states
+
+- `network.target`: network stack is initialized (does not guarantee an IP address is assigned)
+
+- `network-online.target`: network interfaces are fully up and an IP address is bound. Use this for services requiring external network access
+
+- `multi-user.target`: system is fully booted into multi-user CLI mode
+
+- `sockets.target`: system sockets are bound and listening
+
+
+
+
 # `.service` units
 
 - These represent services/programs
@@ -108,6 +291,11 @@ sudo systemctl restart nginx
 # `.target` units
 
 - Targets are essentially groups/states of units
+
+
+
+
+# `.timer` units
 
 
 
@@ -129,4 +317,24 @@ Sep 09 21:02:17 server-01 sshd[2589]: Connection closed by authenticating user a
 
 # recent log
 journalctl --since "1 hour ago"
+```
+
+
+
+
+# Commands
+
+```bash
+systemctl status <service>
+systemctl start <service>
+systemctl stop <service>
+systemctl restart <service>
+systemctl enable <service>
+systemctl disable <service>
+
+journalctl -u <service>
+journalctl -f
+journalctl -b
+
+systemctl --failed
 ```
