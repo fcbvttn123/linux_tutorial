@@ -16,6 +16,10 @@
   - [Special Targets \& System Triggers](#special-targets--system-triggers)
 - [`.service` units](#service-units)
 - [`.target` units](#target-units)
+  - [Groups](#groups)
+  - [Desired State](#desired-state)
+  - [`.target` file](#target-file)
+  - [`default.target`](#defaulttarget)
 - [`.timer` units](#timer-units)
 - [systemd log - `journalctl`](#systemd-log---journalctl)
 - [Commands](#commands)
@@ -290,7 +294,70 @@ WantedBy=multi-user.target
 
 # `.target` units
 
-- Targets are essentially groups/states of units
+- `.target` = a named system state/milestone assembled from dependencies on other units
+
+- `.service`  → "Do this thing"
+
+- `.target`   → "I want the system to have reached this state"
+
+## Groups
+
+- A target can group these together:
+
+    ```bash
+    server.target
+        ├── nginx.service
+        ├── postgresql.service
+        └── sshd.service
+    ```
+
+- Then instead of telling systemd:
+
+    ```bash
+    systemctl start nginx
+    systemctl start postgresql
+    systemctl start sshd
+    ```
+
+- You can tell it `systemctl start server.target`
+
+## Desired State
+
+- Targets are more than just "groups"
+
+- A target generally represents a desired state of the system, or milestones that systemd can try to reach
+
+- Example: `graphical.target` means the system should be in a state where the graphical desktop environment is available
+
+    ```bash
+    graphical.target
+        |
+        +-- NetworkManager.service
+        +-- display-manager.service
+        +-- various other services
+    ```
+
+## `.target` file
+
+```bash
+[Unit]
+Description=My Server Target
+Requires=nginx.service
+Requires=postgresql.service
+```
+
+## `default.target`
+
+- The state the system normally boot into
+
+- Example: `default.target -> graphical.target` or `default.target -> multi-user.target`
+
+- Check it: `systemctl get-default`
+
+    ```bash
+    $ systemctl get-default
+    graphical.target
+    ```
 
 
 
