@@ -32,6 +32,9 @@
   - [What it is](#what-it-is)
   - [Commands](#commands)
 - [Tracking Process: `top`](#tracking-process-top)
+  - [CPU Usage Breakdown](#cpu-usage-breakdown)
+  - [RAM](#ram)
+  - [The Process List](#the-process-list)
 - [CPU Monitoring with `uptime` (the `load average` field)](#cpu-monitoring-with-uptime-the-load-average-field)
 - [I/O Monitoring with `iostat`](#io-monitoring-with-iostat)
 - [Memory Monitoring with `vmstat`](#memory-monitoring-with-vmstat)
@@ -367,49 +370,71 @@ KiB Swap: 33480700 total,    39892 used, 33440808 free. 19454152 cached Mem
  6926 patty    20   0  935888 163456  25576 S   4.3  0.5   5:28.13 chrome
 ```
 
-- CPU Usage Breakdown
+## CPU Usage Breakdown
 
-    - `us`: Percentage of CPU time spent running user processes that are not niced
+  - `us`: Percentage of CPU time spent running user processes that are not niced
 
-    - `sy`: Percentage of CPU time spent running the kernel and its processes
+  - `sy`: Percentage of CPU time spent running the kernel and its processes
 
-    - `ni`: Percentage of CPU time spent running niced (low priority) user processes
+  - `ni`: Percentage of CPU time spent running niced (low priority) user processes
 
-    - `id`: Percentage of CPU time that is idle
+  - `id`: Percentage of CPU time that is idle
 
-    - `wa`: Percentage of CPU time spent waiting for I/O operations to complete. A high value might indicate a disk or network bottleneck
+  - `wa`: Percentage of CPU time spent waiting for I/O operations to complete. A high value might indicate a disk or network bottleneck
 
-    - `hi`: Percentage of CPU time spent servicing hardware interrupts
+  - `hi`: Percentage of CPU time spent servicing hardware interrupts
 
-    - `si`: Percentage of CPU time spent servicing software interrupts
+  - `si`: Percentage of CPU time spent servicing software interrupts
 
-    - `st`: Steal time. In virtualized environments, this is the percentage of CPU time a virtual CPU waits for a real CPU, while the hypervisor is servicing another virtual processor
+  - `st`: Steal time. In virtualized environments, this is the percentage of CPU time a virtual CPU waits for a real CPU, while the hypervisor is servicing another virtual processor
 
-- The Process List
+## RAM
 
-    - `PID`: The unique Process ID
+- Physical RAM: `KiB Mem`
 
-    - `USER`: The user who owns the process
+    - Real Available RAM: `Free + Buffers + Cached`
 
-    - `PR`: The scheduling priority of the process
+    - Notice that used shows 27,467,976 KiB (~26.8 GB used out of 32 GB)
+    
+    - This does not mean your server is running out of RAM
 
-    - `NI`: The "nice" value, which affects its priority
+    - Linux follows the philosophy that "free RAM is wasted RAM."
 
-    - `VIRT`: Virtual Memory used by the process. This is the total amount of memory the process can access
+    - The kernel automatically converts unused physical memory into buffers and cached file memory
 
-    - `RES`: Resident Memory used by the process. This is the non-swapped physical memory a task is using. Understanding the difference between linux top virt res is key for memory analysis
+    - Buffer and Cached Mem are available if an app (like a database or web server) suddenly needs that RAM
 
-    - `SHR`: Shared Memory used by the process
+- `KiB Swap`
 
-    - `S`:The status of the process: S=sleep, R=running, Z=zombie, D=uninterruptible sleep, T=stopped
+    - Swap is a dedicated space on a **storage drive** that acts as an **emergency** of physical RAM
 
-    - `%CPU`: The percentage of CPU time used by this process since the last update
+    - When physical RAM fills up, it can be used to free up physical RAM
 
-    - `%MEM`: The percentage of physical RAM used by this process
+## The Process List
 
-    - `TIME+`: The total CPU time the process has used since it started
+  - `PID`: The unique Process ID
 
-    - `COMMAND`: The command name or command line that started the process
+  - `USER`: The user who owns the process
+
+  - `PR`: The scheduling priority of the process
+
+  - `NI`: The "nice" value, which affects its priority
+
+  - `VIRT`: Virtual Memory used by the process. This is the total amount of memory the process can access
+
+  - `RES`: Resident Memory used by the process. This is the non-swapped physical memory a task is using. Understanding the difference between linux top virt res is key for memory analysis
+
+  - `SHR`: Shared Memory used by the process
+
+  - `S`:The status of the process: S=sleep, R=running, Z=zombie, D=uninterruptible sleep, T=stopped
+
+  - `%CPU`: The percentage of CPU time used by this process since the last update
+
+  - `%MEM`: The percentage of physical RAM used by this process
+
+  - `TIME+`: The total CPU time the process has used since it started
+
+  - `COMMAND`: The command name or command line that started the process
 
 
 # CPU Monitoring with `uptime` (the `load average` field)
