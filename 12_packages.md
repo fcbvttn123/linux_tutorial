@@ -8,6 +8,7 @@
 - [Package Repo](#package-repo)
   - [What is a package repo](#what-is-a-package-repo)
   - [Central Repositories vs Third-Party Repositories](#central-repositories-vs-third-party-repositories)
+  - [Check your central repo (`apt edit-sources`)](#check-your-central-repo-apt-edit-sources)
 - [`tar` and `gzip`](#tar-and-gzip)
   - [Archiving vs. Compression](#archiving-vs-compression)
   - [Compressing/Decompressing Single Files with `gzip`](#compressingdecompressing-single-files-with-gzip)
@@ -80,11 +81,51 @@
 
     - A software vendor creates their own repository, you add their repo to your system once
 
+      - If you ever need software that isn't included in Debian's default collection (like Google Chrome, Docker, VS Code, or PostgreSQL)
+      
+      - The software vendor will instruct you to add a new line pointing to their own custom server URL inside your `/etc/apt/sources.list.d/` directory
+
     - Then you can install and update their software using your normal package manager
 
     - `sudo add-apt-repository "deb https://download.docker.com/linux/ubuntu ..."`
 
     - `sudo apt install docker-ce`
+
+## Check your central repo (`apt edit-sources`)
+
+```bash
+sudo apt edit-sources
+
+#deb cdrom:[Debian GNU/Linux 13.6.0 _Trixie_ - Official amd64 NETINST with firmware 20260711-09:42]/ trixie contrib mai>
+deb http://deb.debian.org/debian/ trixie main non-free-firmware
+deb-src http://deb.debian.org/debian/ trixie main non-free-firmware
+
+deb http://security.debian.org/debian-security trixie-security main non-free-firmware
+deb-src http://security.debian.org/debian-security trixie-security main non-free-firmware
+
+# trixie-updates, to get updates before a point release is made;
+# see https://www.debian.org/doc/manuals/debian-reference/ch02.en.html#_updates_and_backports
+deb http://deb.debian.org/debian/ trixie-updates main non-free-firmware
+deb-src http://deb.debian.org/debian/ trixie-updates main non-free-firmware
+
+# This system was installed using small removable media
+# (e.g. netinst, live or single CD). The matching "deb cdrom"
+# entries were disabled at the end of the installation process.
+# For information about how to configure apt package sources,
+# see the sources.list(5) manual.
+```
+
+- Those URLs point to the official online software repositories (servers) hosted by the Debian organization
+
+- When you run a command like s`udo apt install <package>`, APT contacts those specific web addresses
+
+- It checks the index for the software you requested, downloads the compiled `.deb` files over HTTP, and installs them onto your system
+
+- How the Mirror Network Works (`deb.debian.org`)
+
+  - It is actually a Global Content Delivery Network (CDN) / Redirector
+
+  - When your machine queries `deb.debian.org`, the service uses DNS and geolocation to silently direct your connection to the fastest, geographically closest mirror server near you
 
 
 # `tar` and `gzip`
