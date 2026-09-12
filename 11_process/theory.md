@@ -372,9 +372,33 @@ KiB Swap: 33480700 total,    39892 used, 33440808 free. 19454152 cached Mem
 
 ## CPU Usage Breakdown
 
-  - `us`: Percentage of CPU time spent running user processes that are not niced
+  - `us`: Percentage of CPU time spent running user processes that are not niced (NI = 0)
+
+    - It represents the percentage of total CPU capacity spent running **non-kernel code**
+    
+    - When you write a program or run a service, the CPU executes instructions in different processor execution modes
+
+    - Standard applications run in **Ring 3 (User Mode)**, which restricts them from touching memory or hardware directly
+
+    - What fits under `us`
+
+        - Application Logic: Web servers (Nginx, Apache), databases (PostgreSQL, MySQL), runtimes (Node.js, Python, Java), and containerized apps (Docker/Podman containers)
+
+        - User Utilities: Shell commands, text processing (`grep`, `awk`, `tar`), or compilation tasks (`gcc`, `make`)
+
+        - Desktop Applications: Web browsers, text editors, or desktop environments on GUI systems
 
   - `sy`: Percentage of CPU time spent running the kernel and its processes
+
+    - The instant your app needs to write a file to disk, send a packet across the network, or ask for more RAM, it issues a System Call (`syscall`)
+    
+    - The CPU switches into **Ring 0 (Kernel Mode)** to fulfill the request, and time spent executing that kernel code counts toward sy, not us
+
+    - What fits under `sy`
+
+        - Heavy File System and Disk I/O: `tar` extracting a massive archive, compiling code with hundreds of files
+
+        - Network Packet Processing: high-volume web servers handling thousands of concurrent HTTP connections
 
   - `ni`: Percentage of CPU time spent running niced (low priority) user processes
 
