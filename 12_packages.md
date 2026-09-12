@@ -17,6 +17,7 @@
 - [`rpm` and `dpkg`](#rpm-and-dpkg)
   - [What they are](#what-they-are)
   - [Package Management](#package-management)
+  - [Disadvantages](#disadvantages)
 - [`yum` and `apt`](#yum-and-apt)
   - [Differences from `rpm` and `dpkg`](#differences-from-rpm-and-dpkg)
   - [Package Management](#package-management-1)
@@ -193,6 +194,23 @@ rpm -e some-package.rpm
 # list installed packages
 rpm -qa
 ```
+
+## Disadvantages
+
+- The Dependency Hell Problem
+
+  - If you install a `.rpm` directly using the `rpm -i app.rpm` command, you will often see errors like this:
+
+    ```bash
+    error: Failed dependencies:
+    libcrypto.so.1.1 is needed by app-1.0.0.x86_64
+    ```
+
+  - `rpm` tells you that the software requires `libcrypto.so.1.1`, but `rpm` has no internet capabilities to go find and download it for you
+
+  - You would have to manually find, download, and install that library
+
+  - High-level managers like `apt` and `yum` solve this by querying central online repositories to resolve the entire dependency tree automatically
 
 
 # `yum` and `apt`
