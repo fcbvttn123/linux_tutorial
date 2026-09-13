@@ -29,7 +29,11 @@
 
 # What is `systemd`
 
-- `systemd` is the system and service manager
+- `systemd` is the system and service manager (`d` for `daemon`)
+
+- **Daemons vs Processes**: a process needs to be started by user, daemons are processes running in the background without user needed to start them
+
+- **Daemon Processes** have `d` at the end of the name: `sshd`, `httpd`, `ntpd`...
 
 - It is typically the first userspace process started during boot
 
@@ -84,7 +88,7 @@ sudo systemctl restart nginx
 
 # What is a `unit`
 
-- `systemd` manages things called **units**
+- `systemd` manages things called **units** (different types of deamon)
 
 - `systemd` units are physical text files stored on the filesystem
 
@@ -129,7 +133,7 @@ sudo systemctl restart nginx
 
 ## What they are
 
-- A `systemd` service file is a plain-text configuration file that tells Linux how, when, and under what conditions to run a background process (`daemon`)
+- A `.service` file is a plain-text configuration file that tells Linux how, when, and under what conditions to run a background process (`daemon`)
 
 - Systemd looks for these unit files in two primary locations:
 
@@ -160,7 +164,9 @@ WantedBy=multi-user.target
 
 - 3 main sections: `[Unit]`, `[Service]`, and `[Install]`
 
-- `[Unit]`
+- `[Unit]`: define generic metadata about the service and its dependencies
+
+    - Key Directives: `Description`, `Documentation`, `After`, `Requires`, `Wants`
 
     - `Description`: A human-readable name shown in log outputs (systemctl status)
 
@@ -170,7 +176,9 @@ WantedBy=multi-user.target
 
     - `Wants`: Soft dependency. Systemd will attempt to start the listed unit, but will continue starting your service even if that unit fails
 
-- `[Service]`
+- `[Service]`: define the actual execution details - how to launch, run, reload, and manage the process
+
+    - Key Directives: `Type`, `ExecStart`, `ExecReload`, `Restart`, `User`, `Environment`
 
     - `Type`: Tells systemd how the process behaves
 
@@ -190,7 +198,9 @@ WantedBy=multi-user.target
 
     - `RestartSec`: How long to wait before attempting a restart
 
-- `[Install]`
+- `[Install]`: define system hooks for enablement (systemctl enable/disable) and target binding
+
+    - Key Directives: `WantedBy`, `RequiredBy`, `Alias`
 
     - Enablement and Target States
 
