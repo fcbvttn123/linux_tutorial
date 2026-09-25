@@ -4,6 +4,7 @@
 - [The Shell (`Bash`, `Zsh`, and `Fish`)](#the-shell-bash-zsh-and-fish)
 - [Shell Prompt (`$` and `#`)](#shell-prompt--and-)
 - [Bash Shell `/bin/bash`](#bash-shell-binbash)
+- [The `$PATH` variable](#the-path-variable)
 
 
 # The Shell (`Bash`, `Zsh`, and `Fish`)
@@ -51,3 +52,25 @@
     - Bash typically searches directories listed in the `$PATH` to find the executable, such as `/bin/ls` or `/usr/bin/ls`
 
     - Bash finds `/bin/ls` and starts the `ls` program
+
+
+# The `$PATH` variable
+
+```bash
+$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+```
+
+- When you type a command, your system searches through these directories (**separated by the colon**) to find the corresponding executable file
+
+    - `/usr/local/sbin`, then `/usr/local/bin` and continues
+
+- Imagine you manually install a program in a non-standard directory like `/opt/coolapp/bin`
+
+- If you try to run it by typing `cool` command, you might get a "command not found" error
+
+- This happens because the directory containing your program is not listed in the `PATH` variable, so the shell doesn't know where to look for it.
+
+- To fix this, you can modify the `PATH` variable to include the new directory
+
+- By adding your custom directory to `PATH`, you enable the shell to find and execute your programs from anywhere in the terminal
