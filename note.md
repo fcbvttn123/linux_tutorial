@@ -173,4 +173,4 @@
 
     - You DO NOT manually put files here, `/usr/bin` is normally managed by the Linux distribution's package manager
 
-    - `sudo apt install git` may install `git` executable into `/usr/bin`
+    - `sudo apt install git` may install `git` executable into `/usr/bin` 
