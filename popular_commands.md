@@ -9,8 +9,9 @@
   - [Auditing \& Inspecting Access](#auditing--inspecting-access)
   - [Owner / Permission](#owner--permission)
 - [Processes](#processes)
-  - [ps, top](#ps-top)
-  - [nice](#nice)
+  - [`ps`, `top`](#ps-top)
+  - [`nice`](#nice)
+  - [Signal](#signal)
   - [Job Control](#job-control)
   - [RAM, Disk](#ram-disk)
 - [Package Management](#package-management)
@@ -153,7 +154,7 @@ chmod 755 myfile
 
 # Processes
 
-## ps, top
+## `ps`, `top`
 
 ```bash
 # monitor processes
@@ -174,13 +175,17 @@ KiB Swap: 33480700 total,    39892 used, 33440808 free. 19454152 cached Mem
  6926 patty    20   0  935888 163456  25576 S   4.3  0.5   5:28.13 chrome
 ```
 
-## nice
+## `nice`
 
 ```bash
 # nice/renice
 nice -n 5 apt upgrade
 renice 10 -p 3245
+```
 
+## Signal
+
+```bash
 # signal: terminate gracefully (SIGTERM 15)
 kill PID
 # signal: terminate forcefully (SIFKILL 9)
@@ -267,6 +272,12 @@ apt list --installed
 # installing & removing packages
 sudo apt install <package>
 sudo apt remove <package>
+
+# low-level package utility
+sudo dpkg -i package.deb
+sudo apt --fix-broken install
+dpkg -l # list installed pkg
+dpkg -S /path/to/file # find which package owns a file
 ```
 
 
