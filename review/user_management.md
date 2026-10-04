@@ -124,8 +124,14 @@
 ## Account Creation & Deletion
 
 ```bash
+# create an user with a home dir
+sudo adduser adminuser
+# create an user, -m instructs the system to create the home directory
 sudo useradd -m -s /bin/bash john
+# delete user and its home dir
 sudo userdel -r john
+# switch user, the dash starts a login shell, which loads the target user's complete environment, home directory, and configuration files
+su - username
 ```
 
 ## Password, Lock/Unlock Account
@@ -145,6 +151,8 @@ sudo usermod -U john
 # create group
 sudo groupadd developers
 ## add an existing user to a group
+## -a (or --append): appends the user to the specified group(s). This flag is critical, without -a, usermod -G would remove the user from all other secondary groups they currently belong to
+## -G sudo: specifies the supplemental/secondary group to modify
 sudo usermod -aG developers john
 ```
 
