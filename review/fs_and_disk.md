@@ -20,9 +20,9 @@
   - [Superblock](#superblock)
   - [Inode Table](#inode-table)
   - [Data blocks](#data-blocks)
-- [`/etc/fstab`](#etcfstab)
+- [`/etc/fstab` (mount FS automatically)](#etcfstab-mount-fs-automatically)
   - [What is it](#what-is-it)
-  - [The fstab File Structure](#the-fstab-file-structure)
+  - [The `fstab` File Structure](#the-fstab-file-structure)
 - [Commands](#commands)
 
 
@@ -144,16 +144,16 @@ tmpfs          tmpfs       102544    1068    101476   2% /run
 
 - Example
 
-    ```bash
-    Model: Thumb Drive (scsi)
-    Disk /dev/sdb: 4041MB
-    Sector size (logical/physical): 512B/512B
-    Partition Table: gpt
+  ```bash
+  Model: Thumb Drive (scsi)
+  Disk /dev/sdb: 4041MB
+  Sector size (logical/physical): 512B/512B
+  Partition Table: gpt
 
-    Number  Start   End     Size     File system  Name        Flags
-    1      17.4kB  1000MB  1000MB                first
-    2      1000MB  4040MB  3040MB                second
-    ```
+  Number  Start   End     Size     File system  Name        Flags
+  1      17.4kB  1000MB  1000MB                first
+  2      1000MB  4040MB  3040MB                second
+  ```
 
 
 # Filesystem Structure
@@ -185,7 +185,7 @@ tmpfs          tmpfs       102544    1068    101476   2% /run
 - This is where the actual content of your files and directories is stored
 
 
-# `/etc/fstab`
+# `/etc/fstab` (mount FS automatically)
 
 ## What is it
 
@@ -193,7 +193,7 @@ tmpfs          tmpfs       102544    1068    101476   2% /run
 
 - The system consults this file during startup to determine which filesystems to mount automatically
 
-## The fstab File Structure
+## The `fstab` File Structure
 
 ```bash
 pete@icebox:~$ cat /etc/fstab
@@ -213,4 +213,16 @@ Filesystem     Type     1K-blocks    Used Available Use% Mounted on
 udev           devtmpfs    501356       4    501352   1% /dev
 tmpfs          tmpfs       102544    1068    101476   2% /run
 /dev/sda6      xfs       13752320  460112  13292208   4% /home
+
+# check partition scheme of a disk
+$ sudo parted -l
+Model: Seagate (scsi)
+Disk /dev/sda: 21.5GB
+Sector size (logical/physical): 512B/512B
+Partition Table: msdos
+Number  Start   End     Size    Type      File system     Flags
+1      1049kB  6860MB  6859MB  primary   ext4            boot
+2      6861MB  21.5GB  14.6GB  extended
+5      6861MB  7380MB  519MB   logical   linux-swap(v1)
+6      7381MB  21.5GB  14.1GB  logical   xfs
 ```
