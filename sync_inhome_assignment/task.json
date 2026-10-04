@@ -1,0 +1,361 @@
+{
+  "_authoring_notes": [
+    "Every question needs a matching entry in answer_key.json, keyed '<taskid>.<questionid>'.",
+    "Run 'python3 validate.py' after editing.",
+    "kind: text | number | choice | ordering | command | written",
+    "context: follow-up | same-scenario | new-context. Shown above the question so a candidate knows whether it builds on the previous one. Omit for the first question in a task; others default to same-scenario."
+  ],
+  "meta": {
+    "id": "junior-infra-tech",
+    "version": "1.2",
+    "title": "Sync - Junior IT Infrastructure Technician",
+    "intro": "This is a practical exercise. Each task shows you output from a system and asks you some questions about it. Some answers are a single value, some are a command you would run, and some are a few sentences in your own words. Nothing here needs knowledge of our specific tools - it is all readable from what is in front of you, plus general Linux and hardware sense.",
+    "estimated_minutes": 75
+  },
+  "tasks": [
+    {
+      "id": "t1",
+      "title": "A disk throwing errors",
+      "scenario": "You pick up a ticket on stor-r12-03, one of the storage nodes in our Ceph cluster. Each node holds twelve data disks in a JBOD enclosure, and each disk backs a Ceph OSD. Monitoring flagged read errors on one of them. Here is what you collected on the host.",
+      "artifacts": [
+        {
+          "label": "lsblk",
+          "body": "$ lsblk -o NAME,SERIAL,SIZE,TYPE\nNAME    SERIAL       SIZE TYPE\nsda     ZHZ1A2BC    16.4T disk\nsdb     ZHZ2C4DE    16.4T disk\nsdc     ZHZ3E6FG    16.4T disk\nsdd     ZHZ4G8HI    16.4T disk\nsde     ZHZ5I0JK    16.4T disk\nsdf     ZHZ6K2LM    16.4T disk\nsdg     ZHZ4K8NT    16.4T disk\nsdh     ZHZ8O6PQ    16.4T disk\nsdi     ZHZ9Q8RS    16.4T disk\nsdj     ZHZ0S0TU    16.4T disk\nsdk     ZHZ1U2VW    16.4T disk\nsdl     ZHZ2W4XY    16.4T disk\nnvme0n1 PHLF9210056  894G disk"
+        },
+        {
+          "label": "dmesg",
+          "body": "$ dmesg -T | tail -8\n[Tue Sep 15 03:11:02 2026] sd 1:0:6:0: [sdg] tag#412 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE\n[Tue Sep 15 03:11:02 2026] sd 1:0:6:0: [sdg] tag#412 Sense Key : Medium Error [current]\n[Tue Sep 15 03:11:02 2026] sd 1:0:6:0: [sdg] tag#412 Add. Sense: Unrecovered read error\n[Tue Sep 15 03:11:02 2026] blk_update_request: critical medium error, dev sdg, sector 15625031680\n[Tue Sep 15 03:14:47 2026] sd 1:0:6:0: [sdg] tag#517 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE\n[Tue Sep 15 03:14:47 2026] blk_update_request: critical medium error, dev sdg, sector 15625034112\n[Tue Sep 15 03:22:10 2026] sd 1:0:6:0: [sdg] tag#601 FAILED Result: hostbyte=DID_OK driverbyte=DRIVER_SENSE\n[Tue Sep 15 03:22:10 2026] blk_update_request: critical medium error, dev sdg, sector 15625039488"
+        },
+        {
+          "label": "SMART attributes for the disk in question",
+          "body": "SMART overall-health self-assessment test result: FAILED!\n\nSerial Number:    ZHZ4K8NT\nPower_On_Hours:   68914\n\nID# ATTRIBUTE_NAME          VALUE WORST THRESH TYPE      RAW_VALUE\n  1 Raw_Read_Error_Rate      061   044   006   Pre-fail  138204216\n  5 Reallocated_Sector_Ct    071   071   010   Pre-fail  2384\n  7 Seek_Error_Rate          089   060   045   Pre-fail  812449\n187 Reported_Uncorrect       001   001   000   Old_age   411\n197 Current_Pending_Sector   100   100   000   Old_age   176\n198 Offline_Uncorrectable    100   100   000   Old_age   176"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "text",
+          "prompt": "Which device node is failing? (for example /dev/sdX)"
+        },
+        {
+          "id": "q2",
+          "kind": "text",
+          "prompt": "What is the serial number of that disk?",
+          "context": "follow-up"
+        },
+        {
+          "id": "q3",
+          "kind": "command",
+          "prompt": "Write the command you would run on the host to display the full SMART data for that disk.",
+          "context": "follow-up"
+        },
+        {
+          "id": "q4",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "You are about to pull this disk out of a running storage node with eleven other healthy disks in it. How do you make certain you have the right physical drive before you touch anything? Two or three sentences.",
+          "context": "same-scenario"
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "title": "After the swap",
+      "scenario": "The disk has been replaced and Ceph has started recovering onto it. Every disk in this enclosure is cabled through two SAS paths, so a healthy disk appears twice - once per path. Here is the multipath topology after the replacement.",
+      "artifacts": [
+        {
+          "label": "multipath -ll (trimmed to four devices)",
+          "body": "mpatha (35000c500e1a4b101) dm-0 SEAGATE,ST16000NM001G\nsize=14T features='0' hwhandler='1 alua' wp=rw\n`-+- policy='service-time 0' prio=50 status=active\n  |- 1:0:0:0 sda 8:0   active ready running\n  `- 2:0:0:0 sdm 8:192 active ready running\n\nmpathb (35000c500e1a4b102) dm-1 SEAGATE,ST16000NM001G\nsize=14T features='0' hwhandler='1 alua' wp=rw\n`-+- policy='service-time 0' prio=50 status=active\n  |- 1:0:1:0 sdb 8:16  active ready running\n  `- 2:0:1:0 sdn 8:208 active ready running\n\nmpathc (35000c500e1a4b103) dm-2 SEAGATE,ST16000NM001G\nsize=14T features='0' hwhandler='1 alua' wp=rw\n`-+- policy='service-time 0' prio=50 status=active\n  |- 1:0:2:0 sdc 8:32  active ready running\n  `- 2:0:2:0 sdo 8:224 active ready running\n\nmpathg (35000c500e1a4b107) dm-6 SEAGATE,ST16000NM001G\nsize=14T features='0' hwhandler='1 alua' wp=rw\n`-+- policy='service-time 0' prio=50 status=active\n  `- 1:0:6:0 sdg 8:96  active ready running"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "text",
+          "prompt": "Which multipath device is not in the same state as the others?"
+        },
+        {
+          "id": "q2",
+          "kind": "command",
+          "prompt": "Write the command that produced this output.",
+          "context": "same-scenario"
+        },
+        {
+          "id": "q3",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "The replacement disk is online and Ceph is recovering onto it. Is this ticket finished? Say yes or no, explain what you are looking at, and say what you would do next.",
+          "context": "follow-up"
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "title": "Clearing a disk before it leaves the building",
+      "scenario": "A decommissioned disk has to be securely cleared before it leaves the facility. These five steps are in the wrong order.\n\n  A. Run wipefs -a on the device to clear filesystem and partition-table signatures.\n  B. Run sgdisk --zap-all on the device to destroy the GPT and MBR structures.\n  C. Confirm the serial number matches the work order, and that nothing is mounted or in use on the device.\n  D. Run kpartx -d to remove any device-mapper partition mappings for the device.\n  E. Re-read the device and confirm it reports no signatures and no partitions.",
+      "artifacts": [],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "ordering",
+          "prompt": "Put the five steps in the correct order, as letters separated by commas (for example B,A,E,C,D)."
+        },
+        {
+          "id": "q2",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "Why does the step you put first belong first? One or two sentences.",
+          "context": "follow-up"
+        }
+      ]
+    },
+    {
+      "id": "t4",
+      "title": "A server that will not stay up",
+      "scenario": "Host dfs-206 rebooted twice overnight and is now powered off. You have no physical access and cannot see its console, so you connect to its out-of-band management interface and pull the hardware event log.",
+      "artifacts": [
+        {
+          "label": "system event log",
+          "body": "  1 | 09/12/2026 | 02:14:31 | Power Supply PSU2         | Presence detected          | Asserted\n  2 | 09/12/2026 | 02:14:33 | Fan Fan3A                | Lower Critical going low   | Deasserted\n  3 | 09/18/2026 | 21:07:02 | Temperature Inlet Temp   | Upper Non-critical         | Asserted\n  4 | 09/18/2026 | 21:39:55 | Temperature Inlet Temp   | Upper Non-critical         | Deasserted\n  5 | 09/21/2026 | 04:02:17 | Processor CPU1           | IERR                       | Asserted\n  6 | 09/21/2026 | 04:02:19 | System ACPI Power State  | S5/G2: soft-off            | Asserted\n  7 | 09/21/2026 | 04:06:40 | System Boot Initiated    | Power up                   | Asserted\n  8 | 09/21/2026 | 04:09:12 | Processor CPU1           | IERR                       | Asserted\n  9 | 09/21/2026 | 04:09:14 | System ACPI Power State  | S5/G2: soft-off            | Asserted"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "text",
+          "prompt": "Which component is at fault?"
+        },
+        {
+          "id": "q2",
+          "kind": "command",
+          "prompt": "Write a command that would retrieve this event log from the server's management interface.",
+          "context": "same-scenario"
+        },
+        {
+          "id": "q3",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "You are opening a warranty case with the hardware vendor. Write the case description you would submit: what happened, what the evidence shows, and what you are asking them for. Three to six sentences.",
+          "context": "follow-up"
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "title": "A filesystem that is full, but is not",
+      "scenario": "An alert fires for a full filesystem on an application host. You log in and collect the following.",
+      "artifacts": [
+        {
+          "label": "on the host",
+          "body": "$ df -h /var\nFilesystem             Size  Used Avail Use% Mounted on\n/dev/mapper/vg0-var     40G   40G     0 100% /var\n\n$ du -sh /var\n12G     /var\n\n$ systemctl status rsyslog --no-pager | head -4\n* rsyslog.service - System Logging Service\n     Loaded: loaded (/usr/lib/systemd/system/rsyslog.service; enabled)\n     Active: active (running) since Mon 2026-08-03 09:41:22 EDT; 7 weeks 2 days ago\n   Main PID: 1184 (rsyslogd)"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "choice",
+          "prompt": "df reports 40G used and du reports 12G. What is the most likely explanation? Answer with a single letter.",
+          "choices": [
+            "A. du is only counting files owned by root",
+            "B. A running process is still holding a deleted file open",
+            "C. The filesystem is corrupt and needs to be checked",
+            "D. Reserved blocks account for the difference"
+          ]
+        },
+        {
+          "id": "q2",
+          "kind": "command",
+          "prompt": "Write a command that would help you identify the file or process responsible.",
+          "context": "follow-up"
+        },
+        {
+          "id": "q3",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "How would you reclaim the space, and what would you check or who would you ask before doing it? Two or three sentences.",
+          "context": "follow-up"
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "title": "Capacity arithmetic",
+      "scenario": "Our Ceph pools use erasure coding. A pool is configured with k=8 data chunks and m=3 parity chunks, so usable capacity is:\n\n  usable = raw * k / (k + m)\n\nThe pool sits on 14.0 PiB of raw disk. You do not need to know anything about Ceph to answer this - the formula is all you need.",
+      "artifacts": [],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "number",
+          "prompt": "What is the usable capacity in PiB, to one decimal place?"
+        },
+        {
+          "id": "q2",
+          "kind": "number",
+          "prompt": "The pool is currently 78% full. How many PiB of usable space remain? One decimal place.",
+          "context": "follow-up"
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "title": "The inventory does not match the rack",
+      "scenario": "You are auditing rack R12. Below is what our inventory says, and below that is the live port status from the switch at the top of that rack.",
+      "artifacts": [
+        {
+          "label": "inventory record - rack R12",
+          "body": "HOST            RU    SWITCH     PORT   VLAN   SPEED\nstor-r12-01     U4    sw-r12-a   11     220    25G\nstor-r12-02     U6    sw-r12-a   12     220    25G\nstor-r12-03     U8    sw-r12-a   13     220    25G\nstor-r12-04     U10   sw-r12-a   14     220    25G\nstor-r12-05     U12   sw-r12-a   15     220    25G\nmgmt-r12-01     U42   sw-r12-a   15     99     1G"
+        },
+        {
+          "label": "live port status - sw-r12-a",
+          "body": "PORT   STATUS        VLAN   SPEED    MEDIA\n11     connected     220    25G      fibre\n12     connected     220    25G      fibre\n13     notconnect    220    auto     fibre\n14     connected     220    25G      fibre\n15     connected     220    25G      fibre\n16     connected     99     1G       copper\n17     notconnect    1      auto     fibre"
+        }
+      ],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "text",
+          "prompt": "One host is recorded against a port that is not actually connected. Which host?"
+        },
+        {
+          "id": "q2",
+          "kind": "text",
+          "prompt": "Two hosts are recorded on the same port. Other than mgmt-r12-01, which host is that?",
+          "context": "same-scenario"
+        },
+        {
+          "id": "q3",
+          "kind": "text",
+          "prompt": "Looking at the live port status, which port number is most likely where mgmt-r12-01 is really plugged in?",
+          "context": "follow-up"
+        },
+        {
+          "id": "q4",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "You are on site with physical access to this rack. How would you resolve these two discrepancies, and what would you update when you are done? Three or four sentences.",
+          "context": "follow-up"
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "title": "Everyday Linux and networking",
+      "scenario": "Four short questions. No system output for these - answer from what you know.",
+      "artifacts": [],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "command",
+          "prompt": "A service called collector.service is misbehaving since the machine last booted. Write a single command that shows its log output for the current boot only."
+        },
+        {
+          "id": "q2",
+          "kind": "command",
+          "prompt": "Write a command that shows whether that service is currently running and when it last started.",
+          "context": "follow-up"
+        },
+        {
+          "id": "q3",
+          "kind": "choice",
+          "prompt": "A new host is configured with address 10.20.30.15, netmask 255.255.255.0, and default gateway 10.20.31.1. It can reach other hosts in its own rack but nothing outside it. What is wrong? Answer with a single letter.",
+          "choices": [
+            "A. The netmask should be 255.255.0.0",
+            "B. The gateway is outside the host's own subnet",
+            "C. The host address is a broadcast address",
+            "D. Nothing is wrong; the switch port must be down"
+          ],
+          "context": "new-context"
+        },
+        {
+          "id": "q4",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "You have racked a new server and cabled it, but it does not appear on the network. Without touching any configuration yet, list the things you would check, roughly in the order you would check them.",
+          "context": "new-context"
+        }
+      ]
+    },
+    {
+      "id": "t9",
+      "title": "Asking someone else to do the work",
+      "scenario": "A disk has failed in a facility you cannot get to today. The colocation provider offers a remote hands service: their technician will go to the cage and do what you ask, but they have never seen our equipment, they will not log into anything, and every round of questions costs you an hour.",
+      "artifacts": [],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "Write the remote hands request. Assume the replacement disk is already on site. Include everything their technician needs to do the job correctly on the first attempt, and say what you want them to report back."
+        }
+      ]
+    },
+    {
+      "id": "t10",
+      "title": "Handing it over",
+      "scenario": "It is the end of your shift. The disk in task 1 has been replaced, but the multipath problem in task 2 is still unresolved and you are out of time. The technician taking over has not seen any of this.",
+      "artifacts": [],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "Write the handover note you would leave on the ticket: what you did, where things stand now, what is still outstanding, and what you would do next. Five to ten sentences."
+        }
+      ]
+    },
+    {
+      "id": "t11",
+      "title": "Accounts and access",
+      "scenario": "Three questions about how access is handled on Linux systems.",
+      "artifacts": [],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "choice",
+          "prompt": "On a standard Linux system, how are user passwords stored in /etc/shadow? Answer with a single letter.",
+          "choices": [
+            "A. Encrypted with a system-wide key, so they can be decrypted when needed",
+            "B. Hashed with a per-user salt, so the original cannot be recovered",
+            "C. In plain text, protected only by the file permissions",
+            "D. Encrypted with each user's own password as the key"
+          ]
+        },
+        {
+          "id": "q2",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "Why is it done that way rather than the other way? Two or three sentences.",
+          "context": "follow-up"
+        },
+        {
+          "id": "q3",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "A server accepts SSH connections with a username and password. What, if anything, would you change to bring it in line with good practice, and why?",
+          "context": "new-context"
+        }
+      ]
+    },
+    {
+      "id": "t12",
+      "title": "Monitoring and incidents",
+      "scenario": "Two questions about alerting and what happens when things break.",
+      "artifacts": [],
+      "questions": [
+        {
+          "id": "q1",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "What separates a good monitor or alert from a bad one? Describe the qualities a good one has, and what makes a bad one worse than no alert at all."
+        },
+        {
+          "id": "q2",
+          "kind": "written",
+          "multiline": true,
+          "prompt": "During an outage, what do you think is the hardest part of handling it? And once service is restored, what still needs to happen?",
+          "context": "new-context"
+        }
+      ]
+    }
+  ]
+}

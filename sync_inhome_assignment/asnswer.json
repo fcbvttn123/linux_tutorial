@@ -1,0 +1,315 @@
+{
+  "schema": "sync-exercise-submission/1",
+  "runner_version": "1.0",
+  "exercise": "junior-infra-tech",
+  "tasks_version": "1.2",
+  "candidate": {
+    "name": "David Vu",
+    "email": "davidvu316@gmail.com"
+  },
+  "started": "2026-10-01T22:16:58",
+  "submitted": "2026-10-01T23:39:31",
+  "platform": "nt win32 / python 3.14",
+  "tasks": [
+    {
+      "id": "t1",
+      "title": "A disk throwing errors",
+      "questions": [
+        {
+          "id": "t1.q1",
+          "prompt": "Which device node is failing? (for example /dev/sdX)",
+          "answer": "/dev/sdg",
+          "seconds": 64,
+          "views": 0
+        },
+        {
+          "id": "t1.q2",
+          "prompt": "What is the serial number of that disk?",
+          "answer": "ZHZ4K8NT",
+          "seconds": 25,
+          "views": 0
+        },
+        {
+          "id": "t1.q3",
+          "prompt": "Write the command you would run on the host to display the full SMART data for that disk.",
+          "answer": "sudo smartctl -a /dev/sdg",
+          "seconds": 53,
+          "views": 0
+        },
+        {
+          "id": "t1.q4",
+          "prompt": "You are about to pull this disk out of a running storage node with eleven other healthy disks in it. How do you make certain you have the right physical drive before you touch anything? Two or three sentences.",
+          "answer": "match the SN with the disk, blink the drive LED if the server supports, identify the bay/slot of the disk using commands",
+          "seconds": 110,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t2",
+      "title": "After the swap",
+      "questions": [
+        {
+          "id": "t2.q1",
+          "prompt": "Which multipath device is not in the same state as the others?",
+          "answer": "mpathg",
+          "seconds": 45,
+          "views": 0
+        },
+        {
+          "id": "t2.q2",
+          "prompt": "Write the command that produced this output.",
+          "answer": "multipath -ll",
+          "seconds": 49,
+          "views": 0
+        },
+        {
+          "id": "t2.q3",
+          "prompt": "The replacement disk is online and Ceph is recovering onto it. Is this ticket finished? Say yes or no, explain what you are looking at, and say what you would do next.",
+          "answer": "this ticket is not finished, from my research on google about Ceph, when a disk is replaced, the cluster enters a recovery state, after the replacement, I would monitor the recovery process to make sure that it finishes as expected, it shows the percentage representing the status of the recovery state (like 50% completed), after the recovery process finishes, I want to see something like health: HEALTH_OK or no active recovery operations, related to the previous questions, I can also use the command multipath -ll to make sure the multipath is working as expected",
+          "seconds": 391,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t3",
+      "title": "Clearing a disk before it leaves the building",
+      "questions": [
+        {
+          "id": "t3.q1",
+          "prompt": "Put the five steps in the correct order, as letters separated by commas (for example B,A,E,C,D).",
+          "answer": "C,D,B,A,E",
+          "seconds": 398,
+          "views": 0
+        },
+        {
+          "id": "t3.q2",
+          "prompt": "Why does the step you put first belong first? One or two sentences.",
+          "answer": "C because I don't want to retire the wrong drive, E last because it is a verification after a change, I arrange D, B and A because when I read a doc on the boot process of a Linus system, they explain partitions of a disk first, then each partition has a FS, next is the partition table scheme of each FS and finally mount partitions, so I did the opposite order for decomission a drive.",
+          "seconds": 254,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t4",
+      "title": "A server that will not stay up",
+      "questions": [
+        {
+          "id": "t4.q1",
+          "prompt": "Which component is at fault?",
+          "answer": "CPU",
+          "seconds": 82,
+          "views": 0
+        },
+        {
+          "id": "t4.q2",
+          "prompt": "Write a command that would retrieve this event log from the server's management interface.",
+          "answer": "ipmitool sel list",
+          "seconds": 120,
+          "views": 0
+        },
+        {
+          "id": "t4.q3",
+          "prompt": "You are opening a warranty case with the hardware vendor. Write the case description you would submit: what happened, what the evidence shows, and what you are asking them for. Three to six sentences.",
+          "answer": "The server recorded two CPU1 IERR events on 09/21/2026 at 04:02:17 and 04:09:12, with each event followed approximately two seconds later by an S5/G2 soft-off state. The system attempted to power back on at 04:06:40 between the two incidents, but the second CPU1 IERR caused another shutdown. The repeated CPU1 IERR and shutdown sequence indicates a recurring hardware-level fault. Please investigate the server hardware, including the processor, system board, power subsystem, and relevant firmware, to determine the cause. We request warranty diagnosis and replacement of any failed components necessary to restore stable operation.",
+          "seconds": 399,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t5",
+      "title": "A filesystem that is full, but is not",
+      "questions": [
+        {
+          "id": "t5.q1",
+          "prompt": "df reports 40G used and du reports 12G. What is the most likely explanation? Answer with a single letter.",
+          "answer": "B",
+          "seconds": 93,
+          "views": 0
+        },
+        {
+          "id": "t5.q2",
+          "prompt": "Write a command that would help you identify the file or process responsible.",
+          "answer": "sudo lsof +L1",
+          "seconds": 71,
+          "views": 0
+        },
+        {
+          "id": "t5.q3",
+          "prompt": "How would you reclaim the space, and what would you check or who would you ask before doing it? Two or three sentences.",
+          "answer": "I need to make the process close the deleted file, before that, I need to check what the deleted file is and how critical it is, then I will talk to my supervisor for feedback and also get their approval",
+          "seconds": 161,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t6",
+      "title": "Capacity arithmetic",
+      "questions": [
+        {
+          "id": "t6.q1",
+          "prompt": "What is the usable capacity in PiB, to one decimal place?",
+          "answer": "10.2",
+          "seconds": 79,
+          "views": 0
+        },
+        {
+          "id": "t6.q2",
+          "prompt": "The pool is currently 78% full. How many PiB of usable space remain? One decimal place.",
+          "answer": "2.2",
+          "seconds": 75,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t7",
+      "title": "The inventory does not match the rack",
+      "questions": [
+        {
+          "id": "t7.q1",
+          "prompt": "One host is recorded against a port that is not actually connected. Which host?",
+          "answer": "stor-r12-03",
+          "seconds": 29,
+          "views": 0
+        },
+        {
+          "id": "t7.q2",
+          "prompt": "Two hosts are recorded on the same port. Other than mgmt-r12-01, which host is that?",
+          "answer": "stor-r12-05",
+          "seconds": 11,
+          "views": 0
+        },
+        {
+          "id": "t7.q3",
+          "prompt": "Looking at the live port status, which port number is most likely where mgmt-r12-01 is really plugged in?",
+          "answer": "16",
+          "seconds": 89,
+          "views": 0
+        },
+        {
+          "id": "t7.q4",
+          "prompt": "You are on site with physical access to this rack. How would you resolve these two discrepancies, and what would you update when you are done? Three or four sentences.",
+          "answer": "first, go to U8 and locate stor-r12-03, check the network cable from the server to the switch, identify that port and determine whether the physical cabling is wrong or the inventory is wrong, I wouldn't blindly move cables before confirming what the server is supposed to be connected to, after the physical verification, I would update the rack and network inventory to reflect the actual physical connection, then I check using the commands show interfaces status and confirm the expected state for each port",
+          "seconds": 304,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t8",
+      "title": "Everyday Linux and networking",
+      "questions": [
+        {
+          "id": "t8.q1",
+          "prompt": "A service called collector.service is misbehaving since the machine last booted. Write a single command that shows its log output for the current boot only.",
+          "answer": "journalctl collector.service -b",
+          "seconds": 36,
+          "views": 0
+        },
+        {
+          "id": "t8.q2",
+          "prompt": "Write a command that shows whether that service is currently running and when it last started.",
+          "answer": "systemctl status collector.service",
+          "seconds": 211,
+          "views": 0
+        },
+        {
+          "id": "t8.q3",
+          "prompt": "A new host is configured with address 10.20.30.15, netmask 255.255.255.0, and default gateway 10.20.31.1. It can reach other hosts in its own rack but nothing outside it. What is wrong? Answer with a single letter.",
+          "answer": "B",
+          "seconds": 33,
+          "views": 0
+        },
+        {
+          "id": "t8.q4",
+          "prompt": "You have racked a new server and cabled it, but it does not appear on the network. Without touching any configuration yet, list the things you would check, roughly in the order you would check them.",
+          "answer": "check physical power, check the switch port (show interface stat), verify the server NIC (ip link), check the switch neighbor info (show lldp neighbors), check VLAN assignment for the switch ports",
+          "seconds": 153,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t9",
+      "title": "Asking someone else to do the work",
+      "questions": [
+        {
+          "id": "t9.q1",
+          "prompt": "Write the remote hands request. Assume the replacement disk is already on site. Include everything their technician needs to do the job correctly on the first attempt, and say what you want them to report back.",
+          "answer": "Subject: failed disk replacement, Basic Info: site location, cage, rack, server (hostname), priority, Objective: the replacement disk is already on site, pls physically identify the failed disk in the specified server, and replace it with the provided disk, IMPORTANT: do not remove or replace any other disk, the SN of the failed disk must be vefified before removal, Before Installation: record replacement disk SN, model and capacity, confirm that the replacement is physically compatible with the server and match the required drive type/form factor before installation, Procedure: provide the detailed procedures for the technician, Report Back: server hostname, service tag, info of the failed drive removed (SN, Bay, Model, Capacity), info of the replacement drive (same with the failed drive), replacement drive seated successfully (yes/no), drive LED state after the installation, server power state, alarms/LEDs/physical damage, photographs of the server and the drives affected",
+          "seconds": 696,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t10",
+      "title": "Handing it over",
+      "questions": [
+        {
+          "id": "t10.q1",
+          "prompt": "Write the handover note you would leave on the ticket: what you did, where things stand now, what is still outstanding, and what you would do next. Five to ten sentences.",
+          "answer": "The failed disk in Task 1 was replaced successfully, using the drive serial number to identify the correct disk, and the replacement is now installed in the original bay. The server was left powered on and no other drives or hardware were disturbed. Task 2 remains outstanding: the affected multipath device mpathg still has only one visible path, sdg, while the other comparable multipath devices have two paths. The affected path is associated with WWID 35000c500e1a4b107; the underlying device is sdg. The next technician should verify the physical connectivity and storage path for the missing second path, including cabling/HBA/target visibility and the storage-side presentation if applicable. After correcting the underlying path issue, recheck multipath -ll and confirm that mpathg has the expected number of healthy paths. Also verify the replacement disk and storage system health after recovery. Do not close the ticket until the multipath path issue is resolved and the storage environment is confirmed healthy",
+          "seconds": 193,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t11",
+      "title": "Accounts and access",
+      "questions": [
+        {
+          "id": "t11.q1",
+          "prompt": "On a standard Linux system, how are user passwords stored in /etc/shadow? Answer with a single letter.",
+          "answer": "B",
+          "seconds": 15,
+          "views": 0
+        },
+        {
+          "id": "t11.q2",
+          "prompt": "Why is it done that way rather than the other way? Two or three sentences.",
+          "answer": "Passwords are stored as hashes so the system can verify a password without needing to decrypt and recover the original. A unique salt makes identical passwords produce different stored values and makes attacks much harder.",
+          "seconds": 123,
+          "views": 0
+        },
+        {
+          "id": "t11.q3",
+          "prompt": "A server accepts SSH connections with a username and password. What, if anything, would you change to bring it in line with good practice, and why?",
+          "answer": "I would disable username/password auth and enable public-key auth instead, SSH keys provide strong cryptographic auth without transmitting the password for auth, and they can be individually managed or revoked, additionally, we can use passphrase to protect the private key on a host, using this way, we can secure the system by 2 methods: something we have (private key) and something we know (the passphrase), even if someone can steal our private key, they cannot use it for auth without knowing the passphrase",
+          "seconds": 251,
+          "views": 0
+        }
+      ]
+    },
+    {
+      "id": "t12",
+      "title": "Monitoring and incidents",
+      "questions": [
+        {
+          "id": "t12.q1",
+          "prompt": "What separates a good monitor or alert from a bad one? Describe the qualities a good one has, and what makes a bad one worse than no alert at all.",
+          "answer": "A good alert is actionable: it detects a real problem, tells you what is affected, gives enough context to investigate, and reaches the right person at the right time. It should have a clear threshold, avoid unnecessary duplicates, and ideally include useful information such as the host, service, symptom, and when the problem started. A bad alert is noisy, vague, or not actionable\u2014for example, alerting every time CPU briefly reaches 80% without any evidence of impact. Too many false positives cause alert fatigue, where people start ignoring alerts, which can make a bad alert worse than no alert at all because an important alert can get lost among the noise.",
+          "seconds": 218,
+          "views": 0
+        },
+        {
+          "id": "t12.q2",
+          "prompt": "During an outage, what do you think is the hardest part of handling it? And once service is restored, what still needs to happen?",
+          "answer": "The hardest part during an outage is staying organized while identifying the root cause, because multiple symptoms can appear at once and it is easy to make unnecessary changes that complicate the problem. Clear communication and prioritizing service restoration are also important. Once service is restored, I would verify that the system is fully healthy, continue monitoring it, document the timeline and actions taken, and determine the root cause. Any underlying issues found during the incident should be addressed, and monitoring or procedures should be improved to help prevent the same outage from happening again",
+          "seconds": 103,
+          "views": 0
+        }
+      ]
+    }
+  ],
+  "integrity": {
+    "algorithm": "sha256",
+    "digest": "e8c3383fcd80ce8486a8156bf26d7d3d9b09e4a31bb4c056afd193ee3874cb89"
+  }
+}
