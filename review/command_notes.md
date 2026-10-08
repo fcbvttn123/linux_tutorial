@@ -34,3 +34,10 @@ $ systemctl start ssh
 $ sudo nano /etc/ssh/sshd_config
     PermitRootLogin no
 $ sudo systemctl restart ssh
+
+# -x log with explanatory text, -e end of the log buffer
+$ sudo journalctl -xe
+# view logs since last boot
+sudo journalctl -b
+# filter log for a specific service
+sudo journalctl -u nginx.service -e
