@@ -56,9 +56,25 @@ tmpfs          tmpfs       102544    1068    101476   2% /run
 
 - `/etc`: contains configuration files for the operating system and installed applications
 
+  - `/etc/sudoers`: it is a config file that controls which users/groups are allowed to run commands with elevated privileges (such as root or another user) via the `sudo` command
+
 - `/lib`: contains essential shared library files that `/bin` and `/sbin` depend on to function correctly
 
 - `/boot`: stores the files required for the system's boot process, including the Linux kernel and the boot loader files
+
+- `/var`: hold files that the system actively writes to and modifies during normal operation - log files, database storage, web server root directories, print queues, and package caches
+
+  - `/var/log/`
+
+  - `/var/lib/`: state information and persistent app data - databases (`/var/lib/mysql`, `/var/lib/postgresql`), Docker containers (`/var/lib/docker`)
+
+  - `/var/cache/`: cached application data - downloaded package archives (`/var/cache/apt/archives/`), man page caches
+
+  - `/var/www/`: default document root for web servers - HTML/PHP web files served by Apache or Nginx
+
+  - `/var/spool/`: queued tasks awaiting processing - print jobs, outgoing mail queues (/var/spool/mail), cron jobs
+
+  - `/var/tmp/`: temporary files preserved across reboots
 
 ## User and Application Data
 
