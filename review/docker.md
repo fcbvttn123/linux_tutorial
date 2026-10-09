@@ -82,3 +82,64 @@
     - Advantages: lightweight, starts in milliseconds, fewer resources
 
     - Disadvantages: all containers share the host kernel, isolation is weaker than a VM
+
+## Commands
+
+```bash
+docker version
+docker info
+docker images
+docker ps
+docker ps -a
+docker run
+docker start
+docker stop
+docker restart
+docker rm
+docker rmi
+```
+
+
+# Namespaces and cgroups (high level)
+
+- `namespaces` and `cgroups` are two important **Linux kernel features** that help Docker run containers safely and efficiently
+
+- `namespaces` = **Isolation** — control what a container can see
+
+- `cgroups` = **Resource control** — control how much CPU, memory, and other resources a container can use
+
+## Namespaces
+
+- A Linux namespace isolates a particular type of system resource so that processes in one namespace have a different view of that resource from processes in another
+
+- Main `namespace` types
+
+    - PID: a container can see its own process tree
+
+    - Network: containers can have separate network interfaces and IP addresses
+
+    - UTS (Hostname and domain name): a container can have its own hostname
+
+    - Others: mount, IPC, user
+
+- Example: PID namespaces
+
+    - On a Linux host, you might run `ps aux` and you see processes belonging to the host and potentially many apps
+
+    - Inside a container, you might run: `docker exec -it myweb ps aux`
+
+        - Depending on the image, you will generally see only the processes visible within that container's PID namespace
+
+        - The Nginx process might appear as PID 1 inside the container even though it has a different PID on the host
+
+## Control Groups (`cgroups`)
+
+- A Linux kernel feature for organizing processes and controlling or accounting for their resource usage
+
+- `cgroups` answer, "How much of the host's resources can this container use?"
+
+- Example: Limit container memory
+
+    - Suppose your server has 16 GB of RAM, and you want a test web server to use no more than 512 MB of memory
+
+    - Docker configures the container's resource controls through the host's `cgroup` infrastructure
