@@ -16,6 +16,11 @@
 - [Bind Mounts](#bind-mounts)
   - [What it is](#what-it-is-1)
   - [Bind Mount vs Volume](#bind-mount-vs-volume)
+- [Networking](#networking)
+  - [Bridge Networks](#bridge-networks)
+  - [Host Networks](#host-networks)
+  - [Overlay Networks](#overlay-networks)
+  - [DNS Inside Docker](#dns-inside-docker)
 
 
 # Docker Fundamentals
@@ -240,3 +245,66 @@ $ docker run -d --name web_server -v my_custom_volume:/usr/share/nginx/html ngin
         - Portability: low - dependent on the specific file paths and directory layout of the host machine
 
 - Both mechanisms **bypass the container's temporary writable layer** to persist data
+
+
+# Networking
+
+## Bridge Networks
+
+- A bridge network is a private, virtual network internal to a single Docker host
+
+- It is the default network type a container gets when you run it without specifying anything else
+
+- How it works
+
+    - Docker creates a software bridge (like a virtual switch) on the host machine
+    
+    - Every container attached to this bridge gets its own virtual Ethernet interface (`veth`) and an internal IP address
+
+- Isolation
+
+    - Containers on the same bridge can communicate freely with each other
+    
+    - But they are isolated from containers on other networks and from external traffic (unless ports are explicitly published/forwarded to the host)
+
+- Default vs. Custom Bridges
+
+    - The default `bridge` network DOESN'T support automatic container name resolution (you have to use IP addresses)
+
+    - User-defined custom bridge networks (which you create with `docker network create`) feature built-in automatic service discovery, allowing containers to resolve each other by their container names or aliases
+
+## Host Networks
+
+- With a host network, you remove all network isolation between the container and the Docker host by passing `--network host`
+
+- How it works
+
+    - The container shares the host's network stack directly
+
+    - It does not get its own internal IP address, and any port the container listens on is opened directly on the host machine
+
+## Overlay Networks
+
+- An overlay network extends networking capabilities across multiple physical or virtual Docker hosts (typically managed via Docker Swarm or external orchestrators)
+
+- How it works
+
+    - It creates a distributed virtual network that spans multiple hosts
+
+    - Containers running on Server A can talk directly to containers running on Server B as if they were sitting on the same local switch
+
+## DNS Inside Docker
+
+- Docker has a built-in, lightweight embedded DNS server that manages name resolution for containers running on user-defined networks
+
+- Automatic Service Discovery
+
+    - When you create a custom bridge network and spin up two containers (e.g., a web app and a database), the web app can simply ping or connect to the hostname `database`
+
+    - Docker's internal DNS server intercepts this query and automatically resolves it to the correct internal container IP address
+
+- External Name Resolution
+
+    - If a container tries to reach an external domain (like `github.com`), Docker's DNS server acts as a resolver
+    
+    - It forwards the query to the upstream DNS servers configured on the host machine (typically read from `/etc/resolv.conf`)
