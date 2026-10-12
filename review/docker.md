@@ -1,3 +1,16 @@
+# Table of contents
+
+- [Table of contents](#table-of-contents)
+- [Docker Fundamentals](#docker-fundamentals)
+  - [Images, Containers, Registries](#images-containers-registries)
+  - [Real-World Workflow](#real-world-workflow)
+  - [Containers vs Virtual Machines](#containers-vs-virtual-machines)
+  - [Commands](#commands)
+- [Namespaces and cgroups (high level)](#namespaces-and-cgroups-high-level)
+  - [Namespaces](#namespaces)
+  - [Control Groups (`cgroups`)](#control-groups-cgroups)
+
+
 # Docker Fundamentals
 
 ## Images, Containers, Registries
