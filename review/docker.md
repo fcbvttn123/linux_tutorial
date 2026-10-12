@@ -9,6 +9,13 @@
 - [Namespaces and cgroups (high level)](#namespaces-and-cgroups-high-level)
   - [Namespaces](#namespaces)
   - [Control Groups (`cgroups`)](#control-groups-cgroups)
+- [Volumes](#volumes)
+  - [What it is](#what-it-is)
+  - [Key Characteristics of Docker Volumes](#key-characteristics-of-docker-volumes)
+  - [Common Docker Volume Commands](#common-docker-volume-commands)
+- [Bind Mounts](#bind-mounts)
+  - [What it is](#what-it-is-1)
+  - [Bind Mount vs Volume](#bind-mount-vs-volume)
 
 
 # Docker Fundamentals
@@ -156,3 +163,80 @@ docker rmi
     - Suppose your server has 16 GB of RAM, and you want a test web server to use no more than 512 MB of memory
 
     - Docker configures the container's resource controls through the host's `cgroup` infrastructure
+
+
+# Volumes
+
+## What it is
+
+- A mechanism to keep data, which is generated and used by containers, when the container is stopped, restarted or deleted
+
+- Decoupling the container's lifecycle from the data's lifecycle
+
+## Key Characteristics of Docker Volumes
+
+- Managed by Docker
+
+    - Volumes are stored in a dedicated directory on the host machine managed entirely by Docker
+
+    - On Linux, this is typically located under `/var/lib/docker/volumes/`
+
+    - Regular host processes outside of Docker shouldn't modify these files
+
+- Easy Sharing: Volumes can be easily shared and safely reused among multiple concurrent containers
+
+- Driver Support: Docker supports volume drivers that allow you to store data on remote cloud providers, encrypted storage, or network file systems (NFS)
+
+## Common Docker Volume Commands
+
+```bash
+# create a volume
+$ docker volume create my_custom_volume
+
+# list volumes
+$ docker volume ls
+
+# inspect a volume
+$ docker volume inspect my_custom_volume
+
+# remove an unused volume
+$ docker volume rm my_custom_volume
+
+# attach a volume to a container
+$ docker run -d --name web_server -v my_custom_volume:/usr/share/nginx/html nginx
+```
+
+
+# Bind Mounts
+
+## What it is
+
+- A storage mechanism allowing you to mount a specific file or directory **from the host machine's filesystem** directly into a running container
+
+## Bind Mount vs Volume
+
+- The primary difference between Volumes and Bind Mounts comes down to **ownership and control** over the host file system
+
+    - Volumes are fully managed by Docker and isolated from the host's direct structure
+
+    - Bind Mounts map a specific, absolute path from the host machine directly into the container
+
+- Comparison
+
+    - Docker
+
+        - Storage Location: managed area inside Docker's internal filesystem (e.g., `/var/lib/docker/volumes/ on Linux`)
+
+        - Handled completely via the Docker CLI and API (e.g., `docker volume create`)
+
+        - Portability: high - independent of the host machine's directory layout or OS structure
+
+    - Bind Mount
+
+        - Storage Location: anywhere on the host machine filesystem, defined by an absolute path
+
+        - Handled manually through the host OS's file manager or terminal
+
+        - Portability: low - dependent on the specific file paths and directory layout of the host machine
+
+- Both mechanisms **bypass the container's temporary writable layer** to persist data
