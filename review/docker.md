@@ -21,6 +21,10 @@
   - [Host Networks](#host-networks)
   - [Overlay Networks](#overlay-networks)
   - [DNS Inside Docker](#dns-inside-docker)
+- [Dockerfile](#dockerfile)
+  - [What it is](#what-it-is-2)
+  - [Core Dockerfile Instructions](#core-dockerfile-instructions)
+  - [A Practical Example: `Node.js` App](#a-practical-example-nodejs-app)
 
 
 # Docker Fundamentals
@@ -308,3 +312,61 @@ $ docker run -d --name web_server -v my_custom_volume:/usr/share/nginx/html ngin
     - If a container tries to reach an external domain (like `github.com`), Docker's DNS server acts as a resolver
     
     - It forwards the query to the upstream DNS servers configured on the host machine (typically read from `/etc/resolv.conf`)
+
+
+# Dockerfile
+
+## What it is
+
+- It is a text document that contains all the commands a user could call on the command line to **assemble an image**
+
+- Build an image: `docker build -t my-app-name .`
+
+- Run a container from your new image: `docker run -p 3000:3000 my-app-name`
+
+## Core Dockerfile Instructions
+
+- `FROM`: Sets the base image to start from (e.g., `python:3.11`, `node:18`, `ubuntu:latest`)
+
+    - **Every Dockerfile must start with this**
+
+- `WORKDIR`: Sets the working directory for any instruction that follows it (`RUN`, `CMD`, `COPY`, etc.)
+
+    - If it doesn't exist, Docker will create it
+
+- `COPY` / `ADD`: Copies new files or directories from your local machine into the container's filesystem
+
+    - COPY is preferred over ADD unless you specifically need auto-tar extraction or remote URLs
+
+- `RUN`: Executes commands in a new layer on top of the current image and commits the results
+
+- `ENV`: Sets environment variables (e.g., ENV PORT=8080)
+
+- `EXPOSE`: Informs Docker that the container listens on specific network ports at runtime
+
+- `CMD`: Provides the default command to execute when the container starts
+
+## A Practical Example: `Node.js` App
+
+```dockerfile
+# 1. Choose a lightweight official Node base image
+FROM node:18-alpine
+
+# 2. Set the working directory inside the container
+WORKDIR /app
+
+# 3. Copy package files first (optimizes caching!)
+COPY package*.json ./
+
+# 4. Install dependencies
+RUN npm install
+
+# 5. Copy the rest of the application code
+COPY . .
+
+# 6. Expose the port the app runs on
+EXPOSE 3000
+
+# 7. Define the command to run the app
+CMD ["npm", "start"]
+```
