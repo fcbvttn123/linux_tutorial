@@ -25,6 +25,11 @@
   - [What it is](#what-it-is-2)
   - [Core Dockerfile Instructions](#core-dockerfile-instructions)
   - [A Practical Example: `Node.js` App](#a-practical-example-nodejs-app)
+- [Docker Compose](#docker-compose)
+  - [What it is](#what-it-is-3)
+  - [Components](#components)
+  - [A Practical Example: Web App + Database](#a-practical-example-web-app--database)
+  - [Essential Docker Compose Commands](#essential-docker-compose-commands)
 
 
 # Docker Fundamentals
@@ -369,4 +374,84 @@ EXPOSE 3000
 
 # 7. Define the command to run the app
 CMD ["npm", "start"]
+```
+
+
+# Docker Compose
+
+## What it is
+
+- Docker Compose is a tool for defining and running multi-container Docker applications
+
+- Instead of running separate commands for your database, backend, and frontend, you write a single docker-compose.yml file
+
+## Components
+
+- **Services**: The individual containers that make up your app (e.g., a web service, a database service, a Redis cache). Each service runs an image
+
+- **Networks**: Docker Compose automatically creates a default network for your application
+
+    - This allows your containers to talk to each other using their service names as hostnames
+    
+    - Example: your app can connect to a database at `host: db` instead of an IP address
+
+- **Volumes**: 
+
+    - Used for data persistence
+
+    - Because containers are ephemeral (their data disappears when they are deleted), `volumes` let you store DB files or uploaded media safely on your host machine
+
+## A Practical Example: Web App + Database
+
+```yaml
+version: '3.8' # The version of the docker-compose file format
+
+services:
+  # Service 1: Your Web Application
+  web:
+    build: . # Builds the Dockerfile in the current directory
+    ports:
+      - "3000:3000" # Maps port 3000 on your host to port 3000 in the container
+    environment:
+      - DB_HOST=db
+      - DB_USER=postgres
+      - DB_PASSWORD=secret
+    depends_on:
+      - db # Ensures the database starts BEFORE the web app
+
+  # Service 2: The Database
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: secret
+      POSTGRES_DB: myapp_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Persists database data
+
+# Define the volumes used for persistence
+volumes:
+  pgdata:
+```
+
+## Essential Docker Compose Commands
+
+```bash
+# start your entire application (runs containers in the foreground)
+docker compose up
+
+# start your application in the background (detached mode, highly recommended)
+docker compose up -d
+
+# view the logs (useful for debugging)
+docker compose logs -f
+
+# stop and remove containers, networks, and default volumes
+docker compose down
+
+# rebuild your images (if you made changes to your Dockerfile or code)
+docker compose up --build
 ```
